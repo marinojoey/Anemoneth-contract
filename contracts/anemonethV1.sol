@@ -48,14 +48,20 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         // tx costs. We will have to aggregate IPFS data for each user and somehow get that data
         // into the contract... total mint hardcoded for now at 1000 and a fake user will be given 
         // it
-        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, 1000);
+        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, 0);
+        uint sum;
         for (uint i=0; i<users.length; i++) {
-            address userHist = users[i].addr;
-            historicalEarnings[userHist][thisWeek.weekNumber] = 1000;
+            address userAddr = users[i].addr;
+            uint thisWeekEarnings = 1000; // this is going to hard. Probably will need to seperate into another function
+            historicalEarnings[userAddr][thisWeek.weekNumber] = thisWeekEarnings;
+            sum += thisWeekEarnings;
         }
+        thisWeek.weeksNem = sum;
         require( (thisWeek.weekNumber >= ( (weeklyInfoArr.length-1) + 604800 )) || weeklyInfoArr.length == 0);
         weeklyInfoArr.push(thisWeek);
-        // we need to emit an event here and check for it in the mint function. Otherwise something might go wrong, it doesnt update weeklyInfoArr and mint() would mint last weeks amount again
+        // we need to emit an event here and check for it in the mint function. 
+        // Otherwise something might go wrong, it doesnt update weeklyInfoArr 
+        // and mint() would mint last weeks amount again
     }
 
     function mint() internal {

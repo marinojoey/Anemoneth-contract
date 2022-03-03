@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/josephmarino/Chainshot/anemoneth/contracts/anemonethV1.sol": {
-      "lastModificationDate": 1646331592086,
-      "contentHash": "316f2d721206052c49bb2998a6bb3ef9",
+      "lastModificationDate": 1646332274527,
+      "contentHash": "c264453cb130c37ac5220cb2388e4000",
       "sourceName": "contracts/anemonethV1.sol",
       "solcConfig": {
         "version": "0.8.4",
