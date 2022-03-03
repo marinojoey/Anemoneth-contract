@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     event Distribution(address indexed _addr, uint _amount);
+    uint entryFee = .000000001 ether; // How hard do we want to make it to register?
 
     struct User {
         address addr;
@@ -35,10 +36,12 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         __ERC20_init(name_, symbol_);
         __Ownable_init();
         _mint(address(this), initSupply);
-
     }
 
-    function register(string memory _username) external {
+    function register(string memory _username) external payable {
+        require(msg.value >= entryFee);
+        uint _amount = msg.value * 10000000000000000000000; // Establish exchange rate
+        transferFrom(address(this), msg.sender, _amount);
         users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
     }
 
@@ -57,7 +60,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
             sum += thisWeekEarnings;
         }
         thisWeek.weeksNem = sum;
-        require( (thisWeek.weekNumber >= ( (weeklyInfoArr.length-1) + 604800 )) || weeklyInfoArr.length == 0);
+        require( (thisWeek.weekNumber >= ( (weeklyInfoArr.length-1) + 1 weeks )) || weeklyInfoArr.length == 0);
         weeklyInfoArr.push(thisWeek);
         // we need to emit an event here and check for it in the mint function. 
         // Otherwise something might go wrong, it doesnt update weeklyInfoArr 
@@ -86,4 +89,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         mint();
         distribute();
     }
+    // catch for Ether
+    receive() external payable {}
+    fallback() external payable {}
 }

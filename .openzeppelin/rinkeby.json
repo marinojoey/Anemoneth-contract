@@ -1,20 +1,20 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0x5b573e1Ae86ebafdf763ad33e6d4B365e6625a3B",
-    "txHash": "0x650e32662f791120367ddd18ae5bc934a481a3649c0213d9da308758b13cea07"
+    "address": "0xbb2f18EB0c645E6Da5A54103EEb50E4fc39790bE",
+    "txHash": "0x8c0452d64d805fe92e17b91c40cba4a40f192a7e86ef497cf874bf5c7afdf4d4"
   },
   "proxies": [
     {
-      "address": "0x79B9cbD4a728b715a2Bf90d9bC9623332Ce1A15A",
-      "txHash": "0xb63b3661a6451844ad73ff72920b6a39102b6db58e82142ae4433b4eef6219cd",
+      "address": "0xC72475Ba7Fd8072447459D232EBebBa45d132D37",
+      "txHash": "0x7af60540958d5dac61626144cd88d510d38de8fcc18c32878dd5c07dc3fc69c3",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "44fbe0592a0177eedd48b5841e418d6e5acb15f9f0d70af361ee059cace627b4": {
-      "address": "0xA1D00a1F8916884418da5e4Ae9818D9B5f8c56d9",
-      "txHash": "0xe2f83ce40c3debe855a9e63c90dc9349358df0b87efc3d7b1cfa236ce67b7e38",
+    "76ac21bd8460fd25e71a01f01c1232b895597beaaa5089a3fe044339570cf6c7": {
+      "address": "0xb0c6b3C61326c7a9A96eb12d70d318c1dFeb2C72",
+      "txHash": "0x717d0dda97015c9b543ec20adc979af4b0a708f1086b65c482a44f8946f7830c",
       "layout": {
         "storage": [
           {
@@ -90,9 +90,25 @@
             "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:394"
           },
           {
-            "label": "_owner",
+            "label": "_cap",
             "offset": 0,
             "slot": "101",
+            "type": "t_uint256",
+            "contract": "ERC20CappedUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol:13"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC20CappedUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol:48"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "152",
             "type": "t_address",
             "contract": "OwnableUpgradeable",
             "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
@@ -100,31 +116,45 @@
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "102",
+            "slot": "153",
             "type": "t_array(t_uint256)49_storage",
             "contract": "OwnableUpgradeable",
             "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
           },
           {
-            "label": "test1",
+            "label": "users",
             "offset": 0,
-            "slot": "151",
-            "type": "t_uint256",
+            "slot": "202",
+            "type": "t_array(t_struct(User)1306_storage)dyn_storage",
             "contract": "AnemonethV1",
-            "src": "contracts/anemonethV1.sol:11"
+            "src": "contracts/anemonethV1.sol:16"
           },
           {
-            "label": "test2",
+            "label": "historicalEarnings",
             "offset": 0,
-            "slot": "152",
-            "type": "t_uint256",
+            "slot": "203",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
             "contract": "AnemonethV1",
-            "src": "contracts/anemonethV1.sol:12"
+            "src": "contracts/anemonethV1.sol:19"
+          },
+          {
+            "label": "weeklyInfoArr",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_array(t_struct(WeeklyInfo)1321_storage)dyn_storage",
+            "contract": "AnemonethV1",
+            "src": "contracts/anemonethV1.sol:26"
           }
         ],
         "types": {
           "t_address": {
             "label": "address"
+          },
+          "t_array(t_struct(User)1306_storage)dyn_storage": {
+            "label": "struct AnemonethV1.User[]"
+          },
+          "t_array(t_struct(WeeklyInfo)1321_storage)dyn_storage": {
+            "label": "struct AnemonethV1.WeeklyInfo[]"
           },
           "t_array(t_uint256)45_storage": {
             "label": "uint256[45]"
@@ -141,11 +171,47 @@
           "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
             "label": "mapping(address => mapping(address => uint256))"
           },
+          "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+            "label": "mapping(address => mapping(uint256 => uint256))"
+          },
           "t_mapping(t_address,t_uint256)": {
             "label": "mapping(address => uint256)"
           },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
           "t_string_storage": {
             "label": "string"
+          },
+          "t_struct(User)1306_storage": {
+            "label": "struct AnemonethV1.User",
+            "members": [
+              {
+                "label": "addr",
+                "type": "t_address"
+              },
+              {
+                "label": "username",
+                "type": "t_string_storage"
+              },
+              {
+                "label": "joinDate",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_struct(WeeklyInfo)1321_storage": {
+            "label": "struct AnemonethV1.WeeklyInfo",
+            "members": [
+              {
+                "label": "weekNumber",
+                "type": "t_uint256"
+              },
+              {
+                "label": "weeksNem",
+                "type": "t_uint256"
+              }
+            ]
           },
           "t_uint256": {
             "label": "uint256"
