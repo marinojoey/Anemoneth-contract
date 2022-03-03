@@ -42,7 +42,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
     }
 
-    function weeklyEarnings() public onlyOwner {
+    function weeklyEarnings() internal {
         // Calculate how much NEM to give to each EAO and how much total NEM to mint
         // This will be hard. Each post/comment/interaction cannot be an eth tx due to prohibitive
         // tx costs. We will have to aggregate IPFS data for each user and somehow get that data
@@ -79,5 +79,11 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
             uint amount = historicalEarnings[users[i].addr][weekNumber];
             _transfer(address(this), to, amount);
         }
+    }
+
+    function settleUP() external onlyOwner {
+        weeklyEarnings();
+        mint();
+        distribute();
     }
 }
