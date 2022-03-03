@@ -8,21 +8,17 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract AnemonethV1 is Initializable, ERC20Upgradeable, OwnableUpgradeable {
 
-    uint public test1;
-    uint public test2;
+    struct User {
+        address addr;
+        string username;
+        uint joinDate;
+    }
+    
+    mapping(address => uint) balance;
 
-    function initialize(uint _test1, uint _test2) external initializer {
-        __ERC20_init("AnemonEth", "NEM");
+    function initialize(string memory name, string memory symbol, uint256 initialSupply) public virtual initializer {
+        __ERC20_init(name, symbol);
         __Ownable_init();
-        test1 = _test1;
-        test2 = _test2;
-    }
-
-    function mint(address to, uint amount) external onlyOwner {
-        _mint(to, amount);
-    }
-
-    function add() public view returns(uint) {
-        return test1 + test2;
+        _mint(msg.sender, initialSupply);
     }
 }
