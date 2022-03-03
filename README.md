@@ -1,0 +1,5 @@
+npm install dotenv
+
+RINKEBY_URL=
+RINKEBY_PRIVATE_KEY=
+ETHERSCAN_KEY=
