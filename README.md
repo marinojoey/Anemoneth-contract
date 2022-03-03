@@ -14,6 +14,6 @@ npm install dotenv
 
 RINKEBY_URL= https://www.alchemy.com/       
 
-RINKEBY_PRIVATE_KEY= 0x       
+RINKEBY_PRIVATE_KEY= metamask     
 
-ETHERSCAN_KEY= 123       
+ETHERSCAN_KEY= https://etherscan.io/      
