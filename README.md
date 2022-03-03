@@ -8,7 +8,7 @@ Implementation: https://rinkeby.etherscan.io/address/0xa1d00a1f8916884418da5e4ae
  
  ------------------
 ### @dev Install
-npm install dotenv
+`npm install dotenv`
 
 ### And place the following variables inside
 
