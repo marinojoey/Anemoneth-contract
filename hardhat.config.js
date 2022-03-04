@@ -9,10 +9,17 @@ module.exports = {
   networks: {
     rinkeby: {
       url: process.env.RINKEBY_URL,
-      accounts: [process.env.RINKEBY_PRIVATE_KEY]
+      accounts: [process.env.METAMASK_PRIVATE_KEY]
+    },
+    mumbai: {
+      url: process.env.MUMBAI_URL,
+      accounts: [process.env.METAMASK_PRIVATE_KEY]
     }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_KEY
+  },
+  polygonscan: {
+    apiKey: process.env.POLYGONSAN_KEY
   }
 };
