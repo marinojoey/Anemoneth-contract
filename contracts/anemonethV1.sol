@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     event Distribution(address indexed _addr, uint _amount);
-    uint entryFee; // How hard do we want to make it to register?
 
     struct User {
         address addr;
@@ -30,18 +29,17 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         string memory name_, 
         string memory symbol_,
         uint256 cap_,
-        uint256 initSupply,
-        uint256 _entryFee
+        uint256 initSupply
+        // uint256 _entryFee
         ) public initializer {
         __ERC20Capped_init(cap_);
         __ERC20_init(name_, symbol_);
         __Ownable_init();
         _mint(address(this), initSupply);
-        entryFee = _entryFee;
     }
 
     function register(string memory _username) external payable {
-        require(msg.value >= entryFee);
+        require(msg.value >= .000000001 ether);
         uint _amount = msg.value * 10000000000000000000000; // Establish exchange rate
         transferFrom(address(this), msg.sender, _amount);
         users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
@@ -91,6 +89,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         mint();
         distribute();
     }
+
     // catch for Ether
     receive() external payable {}
     fallback() external payable {}
