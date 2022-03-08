@@ -54,19 +54,23 @@ async function callRegister() {
       <div className='title'>
         Anemoneth
       </div>
-      <div className='userinfo'>
-          <b>Your address:</b> {address}
-          <b>Your balance:</b> {balance}
-      </div>
-      <div className='registercall'>
-        <p>Must send .000000001 or more ether (1000000000 wei) to be able to register </p>
-        <label htmlFor='msgValue'>Amount in wei:   </label>
-        <input type="number" className='msgValue' placeholder='Amount'></input>
-        <label htmlFor='usrnm'> Username: (cannot be changed) </label>
-        <input type="text" className='usrnm' placeholder='username'></input>
-        <button className='registerBtn' onClick={callRegister}>
-          Register
-        </button>
+      <div className='pieces'>
+        <div className='userinfo'>
+            <div className='addr'> <b>Your address:</b> {address}</div>
+            <div className='blnc'>Your balance:{balance}</div>
+        </div>
+        <div className='registercall'>
+          <div className='msgvalwrapper'>
+            <div className='instructions'>Must send .000000001 or more ether (1000000000 wei) to be able to register </div>
+            <label htmlFor='msgValue' className='msgvaluelbl'>Amount in wei:</label>
+            <input type="number" className='msgValue' placeholder='Amount'></input>
+          </div>
+          <div className='usrnmwrapper'>
+            <label htmlFor='usrnm' className='usrnmlbl'> Username: (cannot be changed) </label>
+            <input type="text" className='usrnm' placeholder='username'></input>
+            <button className='registerbtn' onClick={callRegister}>Register</button>
+          </div>
+        </div>
       </div>
     </div>
   )
