@@ -1,5 +1,5 @@
 import React from 'react'
-import './login.css';
+import './login.scss';
 import { ethers } from 'ethers';
 import anemonethJSON from '../../utils/anemoneth.json'
 
@@ -50,28 +50,21 @@ async function callRegister() {
   } else console.log("Increase msg.value")
 }
   return (
-    <div>
-        <div className='title'>
+    <div className='loginpage'>
+      <div className='title'>
         Anemoneth
       </div>
       <div className='userinfo'>
-        <p>
           <b>Your address:</b> {address}
-        </p>
-        <p>
           <b>Your balance:</b> {balance}
-        </p>
       </div>
-      <div className='contractcalls'>
+      <div className='registercall'>
         <p>Must send .000000001 or more ether (1000000000 wei) to be able to register </p>
-        <p></p>
-        <label htmlFor='regAmt'>Amount in wei:   </label>
-        <input type="number" className='regAmt' placeholder='Amount'></input>
-        <br></br>
+        <label htmlFor='msgValue'>Amount in wei:   </label>
+        <input type="number" className='msgValue' placeholder='Amount'></input>
         <label htmlFor='usrnm'> Username: (cannot be changed) </label>
         <input type="text" className='usrnm' placeholder='username'></input>
-        <br></br>
-        <button className='register' onClick={callRegister}>
+        <button className='registerBtn' onClick={callRegister}>
           Register
         </button>
       </div>
