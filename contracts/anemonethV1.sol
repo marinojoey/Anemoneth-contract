@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "hardhat/console.sol";
 
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
@@ -39,10 +40,14 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
 
     function register(string memory _username) external payable {
-        require(msg.value >= .000000001 ether);
-        uint _amount = msg.value * 10000000000000000000000; // Establish exchange rate
-        transferFrom(address(this), msg.sender, _amount);
+        require(msg.value >= 1 gwei);
+        uint256 _amount = msg.value / 1000000000; // 1 CLWN = 1 Gwei
+        _transfer(address(this), msg.sender, _amount);
         users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
+    }
+
+    function getUser(uint256 index) external view returns(address) {
+        return users[index].addr;
     }
 
     function weeklyEarnings() internal {
@@ -65,6 +70,10 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         // we need to emit an event here and check for it in the mint function. 
         // Otherwise something might go wrong, it doesnt update weeklyInfoArr 
         // and mint() would mint last weeks amount again
+    }
+
+    function mintViaOwner() external onlyOwner {
+        _mint(address(this), 10000);
     }
 
     function mint() internal {

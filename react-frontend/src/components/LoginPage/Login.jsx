@@ -5,8 +5,8 @@ import anemonethJSON from '../../utils/anemoneth.json'
 
 function Login() {
 
-const anemonethProxyAddress = "0x25a0C89a55dfF4b779bde0DDa7897F6Ef06e6565";
-// const anemonethImpAddress = "0x4a391779abcc217c3beab96a639934116069b830";
+const anemonethProxyAddress = "0x798B3Be0d5FC02f3A7B2E733cB1Bc6f1340bcad6";
+// const anemonethImpAddress = "0x96ca0919F1133DA3Bb76dD90747012D754Fc96d9";
 
 const [address, setAddress] = React.useState("");
 const [balance, setBalance] = React.useState(0);
@@ -61,7 +61,7 @@ async function callRegister() {
         </div>
         <div className='registercall'>
           <div className='msgvalwrapper'>
-            <div className='instructions'>Must send .000000001 or more ether (1000000000 wei) to be able to register </div>
+            <div className='instructions'>Must send 1000000000 wei (1 Gwei) to be able to register </div>
             <label htmlFor='msgValue' className='msgvaluelbl'>Amount in wei:</label>
             <input type="number" className='msgValue' placeholder='Amount'></input>
           </div>
