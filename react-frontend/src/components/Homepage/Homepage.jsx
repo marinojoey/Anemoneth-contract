@@ -15,21 +15,21 @@ function Homepage() {
   const { ethereum } = window;
   let provider;
 
-  if(ethereum) {
-    ethereum.request({ method: 'eth_requestAccounts'});
-    provider = new ethers.providers.Web3Provider(ethereum);
-    getUserDetails();
-  } else {
-    console.log("Metamask not found. Pleast install MetaMask!")
-  }
+  // if(ethereum) {
+  //   ethereum.request({ method: 'eth_requestAccounts'});
+  //   provider = new ethers.providers.Web3Provider(ethereum);
+  //   getUserDetails();
+  // } else {
+  //   console.log("Metamask not found. Pleast install MetaMask!")
+  // }
 
-  async function getUserDetails() {
-    const signer = await provider.getSigner();
-    const addr = await signer.getAddress();
-    const userBalance = await provider.getBalance(addr);
-    setAddress(addr);
-    setBalance(ethers.utils.formatEther(userBalance));
-  }
+  // async function getUserDetails() {
+  //   const signer = await provider.getSigner();
+  //   const addr = await signer.getAddress();
+  //   const userBalance = await provider.getBalance(addr);
+  //   setAddress(addr);
+  //   setBalance(ethers.utils.formatEther(userBalance));
+  // }
 
   async function callRegister() {
     let regAmt = parseInt(document.querySelector('.regAmt').value);
@@ -53,16 +53,16 @@ function Homepage() {
       <>    
         <h1>HOMEPAGE</h1>
         <div className='loginpage'>
-            <div className='userinfo'>
+            {/* <div className='userinfo'>
                 <div className='addr'> <b>Your address:</b> {address}</div>
                 <div className='blnc'>Your balance:{balance}</div>
-            </div>
+            </div> */}
             <div className='registercall'>
-            <div className='msgvalwrapper'>
+            {/* <div className='msgvalwrapper'>
                 <div className='instructions'>Must send .000000001 or more ether (1000000000 wei) to be able to register </div>
                 <label htmlFor='msgValue' className='msgvaluelbl'>Amount in wei:</label>
                 <input type="number" className='msgValue' placeholder='Amount'></input>
-            </div>
+            </div> */}
             <div className='usrnmwrapper'>
                 <label htmlFor='usrnm' className='usrnmlbl'> Username: (cannot be changed) </label>
                 <input type="text" className='usrnm' placeholder='username'></input>
