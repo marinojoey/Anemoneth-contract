@@ -40,9 +40,9 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
 
     function register(string memory _username) external payable {
-        require(msg.value >= 1 gwei);
-        uint256 _amount = msg.value / 1000000000; // 1 CLWN = 1 Gwei
-        _transfer(address(this), msg.sender, _amount);
+        require(msg.value == 1 gwei, "please send 1 Gwei");
+        // uint256 _amount = msg.value / 1000000000; // 1 CLWN = 1 Gwei
+        _transfer(address(this), msg.sender, 1);
         users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
     }
 
