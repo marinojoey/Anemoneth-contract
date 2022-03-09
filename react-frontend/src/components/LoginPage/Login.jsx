@@ -3,8 +3,6 @@ import './login.scss';
 import LoginRegisterComponent from '../LoginRegisterComponent/LoginRegister'
 
 function Login() {
-
-
   return (
     <div className='loginpage'>
       <div className='loginPiecesContainer'>

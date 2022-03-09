@@ -21,21 +21,7 @@ function LoginRegister() {
 
     return (
         <div id="LoginRegisterComponent">
-            <div>
-                <form>
-                    <input className="loginInputs" type="text" id="login" name="login" placeholder="Email or Username"></input>
-                    <br />
-                    <input className="loginInputs" type="password" id="password" name="password" placeholder="Password"></input>
-                    <br />
-                    <input className="loginButtons" type="submit" id="loginSubmit" name="loginSubmit" value="Log In" />
-                </form>
-                <button className="loginButtons" onClick={() => connectWalletHandler()}>Log In with MetaMask</button>
-                <br />
-                <a href="">Forgot Password</a>
-            </div>
-            <div>
-                <button className="loginButtons">Create new account</button>
-            </div>
+                <button className="loginButtons" onClick={() => connectWalletHandler()}>Connect Wallet</button>
         </div>
     )
 }
