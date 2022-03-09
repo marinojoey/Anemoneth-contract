@@ -1,0 +1,112 @@
+@import "../../global.scss";
+
+.loginpage {
+    background-color: $ethgray;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    color: $ethpeach;
+
+    .title {
+        display: flex;
+        height: 20%;
+        width: 100%;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        font-size: 2.2vw;
+        align-items: center;
+        justify-content: center;
+    }
+    .pieces {
+        display: flex;
+        height: 80vh;
+        width: 100%;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        font-size: 1.2vw;
+
+
+        .userinfo {
+            display: flex;
+            height: 100%;
+            width: 50%;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+    
+            .addr {
+                display: flex;
+                height: 50%;
+                width: 100%;
+                align-items: flex-end;
+                justify-content: center;
+                box-sizing: border-box;
+        
+            }
+            .blnc {
+                display: flex;
+                height: 50%;
+                width: 100%;
+                align-items: flex-start;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+        }
+    
+        .registercall {
+            display: flex;
+            height: 100%;
+            width: 50%;
+            flex-wrap: wrap;
+    
+            .msgvaluewrapper {
+                display: flex;
+                height: 50%;
+                width: 100%;
+
+                .instructions {
+                    display: flex;
+                    height: 100%;
+                    width: 100%;
+                }
+
+                .msgvaluelbl {
+                    display: flex;
+                    height: 100%;
+                    width: 100%;
+                }
+                .msgValue {
+                    display: flex;
+                    height: 50%;
+                    width: 100%;
+                }
+            }
+
+            .usernamwrapper {
+                display: flex;
+                height: 50%;
+                width: 100%;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: center;
+
+                .usrnmlbl {
+                    display: flex;
+                    height: 100%;
+                    width: 100%;
+                }
+                .usrnm {
+                    display: flex;
+                    height: 100%;
+                    width: 100%;
+                }
+                .registerbtn {
+                    display: flex;
+                    height: 5%;
+                    width: 20%;
+                }
+            }
+        }
+    }
+}
