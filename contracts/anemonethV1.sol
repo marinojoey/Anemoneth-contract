@@ -7,23 +7,28 @@ import "hardhat/console.sol";
 
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
+
     event Distribution(address indexed _addr, uint _amount);
 
     struct User {
         address addr;
         string username;
         uint joinDate;
+        bool isUser;
     }
     User[] users;
+    mapping(address => User) usersMap;
 
-    // user address => weekNumber => weeklyEarning
-    mapping(address => mapping(uint => uint)) historicalEarnings;
+    // user weekNumber => address => weeklyEarning
+    mapping(uint => mapping(address => uint)) historicalEarnings;
 
-    // Tracks weekly mints of NEM
     struct WeeklyInfo {
         uint weekNumber;
+        address[] weeksEarners;
         uint weeksNem;
     }
+
+    // I would really like to not use this. Expensive.
     WeeklyInfo[] weeklyInfoArr;
 
     function initialize(
@@ -40,28 +45,27 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
 
     function register(string memory _username) external payable {
-        require(msg.value == 1 gwei, "please send 1 Gwei");
-        // uint256 _amount = msg.value / 1000000000; // 1 CLWN = 1 Gwei
+        require(msg.value == 1 gwei);
+        require(usersMap[msg.sender].isUser == false, "Account already registered!");
         _transfer(address(this), msg.sender, 1);
-        users.push(User({ addr: msg.sender, username: _username, joinDate: block.timestamp}));
+        User memory newUser = User({ addr: msg.sender, username: _username, joinDate: block.timestamp, isUser: true});
+        users.push(newUser);
+        usersMap[msg.sender] = newUser;
     }
 
     function getUser(uint256 index) external view returns(address) {
         return users[index].addr;
     }
-
-    function weeklyEarnings() internal {
-        // Calculate how much NEM to give to each EAO and how much total NEM to mint
-        // This will be hard. Each post/comment/interaction cannot be an eth tx due to prohibitive
-        // tx costs. We will have to aggregate IPFS data for each user and somehow get that data
-        // into the contract... total mint hardcoded for now at 1000 and a fake user will be given 
-        // it
-        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, 0);
+    function isRegistered(address addr) external view returns(bool) {
+        return usersMap[addr].isUser;
+    }
+    // _weeksArr will be formulated based on only those THAT EARNED that week
+    function weeksEarners(address _weeksArr) internal {
+        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _weeksArr, 0);
         uint sum;
-        for (uint i=0; i<users.length; i++) {
-            address userAddr = users[i].addr;
-            uint thisWeekEarnings = 1000; // this is going to hard. Probably will need to seperate into another function
-            historicalEarnings[userAddr][thisWeek.weekNumber] = thisWeekEarnings;
+        for (uint i=0; i<_weeksArr; i++) {
+            address userAddr = _weeksArr[i];
+            historicalEarnings[thisWeek.weekNumber][userAddr] = thisWeekEarnings;
             sum += thisWeekEarnings;
         }
         thisWeek.weeksNem = sum;
@@ -70,6 +74,9 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         // we need to emit an event here and check for it in the mint function. 
         // Otherwise something might go wrong, it doesnt update weeklyInfoArr 
         // and mint() would mint last weeks amount again
+    }
+    function weeklyEarnings(uint256[] _clwn) internal {
+        
     }
 
     function mintViaOwner() external onlyOwner {
