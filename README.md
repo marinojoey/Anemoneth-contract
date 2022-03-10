@@ -7,7 +7,7 @@ Proxy: https://rinkeby.etherscan.io/address/0x79B9cbD4a728b715a2Bf90d9bC9623332C
 Implementation: https://rinkeby.etherscan.io/address/0xa1d00a1f8916884418da5e4ae9818d9b5f8c56d9
  
  ------------------
-### @dev Install
+### DEPENDENCIES
 
 ├── @nomiclabs/hardhat-ethers@2.0.5
 ├── @nomiclabs/hardhat-etherscan@3.0.1
@@ -18,12 +18,15 @@ Implementation: https://rinkeby.etherscan.io/address/0xa1d00a1f8916884418da5e4ae
 ├── chai@4.3.6
 ├── dotenv@16.0.0
 ├── ethereum-waffle@3.4.0
+├── hardhat-gas-reporter@1.0.8
 └── hardhat@2.8.4
 
-### And place the following variables inside
+### create .env and place the following variables inside
 
 RINKEBY_URL= https://www.alchemy.com/       
 
 RINKEBY_PRIVATE_KEY= https://metamask.io/ 
 
-ETHERSCAN_KEY= https://etherscan.io/      
+ETHERSCAN_KEY= https://etherscan.io/    
+
+COINMARKET_KEY= https://pro.coinmarketcap.com/
