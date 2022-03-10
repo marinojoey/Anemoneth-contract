@@ -31,7 +31,7 @@ function LoginRegister() {
                 </form>
                 <button className="loginButtons" onClick={() => connectWalletHandler()}>Log In with MetaMask</button>
                 <br />
-                <a href="">Forgot Password</a>
+                {/* <a href="">Forgot Password</a> */}
             </div>
             <div>
                 <button className="loginButtons">Create new account</button>
