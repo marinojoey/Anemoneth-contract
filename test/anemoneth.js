@@ -5,15 +5,19 @@ const { solidity } = require("ethereum-waffle");
 
 chai.use(solidity);
 
-describe("Anemoneth contract", function () {
+describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", function () {
 
   let AnemonethV1;
   let owner;
-  let user;
+  let user1;
+  let user2;
+  let user3;
+  let user4;
+  let user5;
   let AnemonethContract;
 
   before(async function() {
-    [owner, user1, user2, user3] = await ethers.getSigners();
+    [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
 
     AnemonethV1 = await ethers.getContractFactory("AnemonethV1");
 
@@ -57,16 +61,11 @@ describe("Anemoneth contract", function () {
         const user1MapCheck = await AnemonethContract.isRegistered(user1.address);
         expect(user1MapCheck).to.equal(true);
       });
-      // it("Should not allow user to register twice", async function () {        
-      //   const tx2 = await AnemonethContract.connect(user).register('test', {value: 1000000000}); // 1 Gwei
-      //   expect(async () => { await tx2.wait() } ).to.be.revertedWith("Account already registered!");
-      //   // This functionality works. But it is a mocha quirk that the test wont pass
-      // });
   })
-  describe("Weekly Distribution", function() {
+  describe("WeeksEarners for 5 users", function() {
     before( async function() { 
-      const tx1 = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
-      await tx1.wait();
+      // const tx1 = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
+      // await tx1.wait(); // user registered in last describe block. toggle if needed
       const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
       await tx2.wait(); 
       const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
@@ -74,16 +73,152 @@ describe("Anemoneth contract", function () {
       const tx4 = await AnemonethContract.connect(user4).register('test', {value: 1000000000}); // 1 Gwei
       await tx4.wait(); 
       const tx5 = await AnemonethContract.connect(user5).register('test', {value: 1000000000}); // 1 Gwei
-      await tx5.wait(); 
-    })
-    it("", async function () {        
-        const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
-        expect(parseInt(contractClWNBalance)).to.equal(10000);
+      await tx5.wait();
+    });
+    it("Should have 5 people register", async function () {        
+        const userCount = await AnemonethContract.getUserCount();
+        expect(userCount).to.equal(5);
+    });    
+    it("Should push earnings into weeklyInfoAr for the first time", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);    
+      const weeklyInfoArr = await AnemonethContract.getWeeklyInfoArrLength();
+      expect(weeklyInfoArr).to.equal(1);
+    });
+    // it("Should allow for one tier to be empty", async function () {    
+    //   await AnemonethContract.connect(owner).weeklyEarnings([user1.address]);    
+    //   const weeklyInfoArr = await AnemonethContract.getWeeklyInfoArrLength();
+    //   expect(weeklyInfoArr).to.equal(1);
+    // });
+    it("Should distribute correctly for LOW tier", async function () {    
+      const historicalEarnings = await AnemonethContract.gethistoricalEarnings(0, user1.address);
+      expect(historicalEarnings).to.equal(1);
+    });
+    it("Should distribute correctly for HIGH tier", async function () {
+      const historicalEarnings = await AnemonethContract.gethistoricalEarnings(0, user5.address);
+      expect(historicalEarnings).to.equal(3);
+    });
+    // it("Nested mapping should work for all 5 accounts", async function () {        
+      
+    //   expect(userCount).to.equal(5);
+    // });
+    it("Should push earnings into weeklyInfoArr for the second time", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user5.address, user2.address], [user3.address, user4.address], [user1.address]);    
+      const weeklyInfoArr = await AnemonethContract.getWeeklyInfoArrLength();
+      expect(weeklyInfoArr).to.equal(2);
+    });
+    it("Should distribute the second round correctly", async function () {    
+      const historicalEarnings = await AnemonethContract.gethistoricalEarnings(1, user1.address);
+      expect(historicalEarnings).to.equal(3);
     });
   })
-
-
-
-
-
 });
+
+describe.skip("Anemoneth contract instance 2, minting", function () { 
+  let AnemonethV1;
+  let owner;
+  let user1;
+  let user2;
+  let user3;
+  let user4;
+  let user5;
+  let AnemonethContract;
+  
+  before(async function() {
+    [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
+
+    AnemonethV1 = await ethers.getContractFactory("AnemonethV1");
+
+    AnemonethContract = await upgrades.deployProxy(AnemonethV1, ["anemoneth", "CLWN", 9000000000000, 10000]);
+
+    await AnemonethContract.deployed();
+
+    const tx = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
+    await tx.wait();
+    const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
+    await tx2.wait(); 
+    const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
+    await tx3.wait(); 
+    const tx4 = await AnemonethContract.connect(user4).register('test', {value: 1000000000}); // 1 Gwei
+    await tx4.wait(); 
+    const tx5 = await AnemonethContract.connect(user5).register('test', {value: 1000000000}); // 1 Gwei
+    await tx5.wait();
+
+  });
+
+  describe.skip("Registration", function() {
+    // This works, but the UX needs to be improved. Weird error.
+      it("Should not allow user to register twice", async function () {        
+        expect(await AnemonethContract.connect(user1).register('test', {value: 1000000000})).to.be.revertedWith("Account already registered!");
+      });
+  })
+  describe("Minting", function() { 
+    it("Contract address should have 9995 CLWN before weekly mint", async function () {       
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(9995);
+    });
+    it("Contract address should have 10004 CLWN after first weekly mint", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
+      await AnemonethContract.connect(owner).weeklyMint();   
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(10004);
+    });
+    it("Contract address should handle second weekly mint", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user5.address, user2.address], [user3.address, user4.address], [user1.address]);
+      await AnemonethContract.connect(owner).weeklyMint();   
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(10013);
+    });
+  })
+})
+
+describe("Anemoneth contract instance 3, distribution", function () { 
+  let AnemonethV1;
+  let owner;
+  let user1;
+  let user2;
+  let user3;
+  let user4;
+  let user5;
+  let AnemonethContract;
+  
+  before(async function() {
+    [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
+
+    AnemonethV1 = await ethers.getContractFactory("AnemonethV1");
+
+    AnemonethContract = await upgrades.deployProxy(AnemonethV1, ["anemoneth", "CLWN", 9000000000000, 10000]);
+
+    await AnemonethContract.deployed();
+
+    const tx = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
+    await tx.wait();
+    const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
+    await tx2.wait(); 
+    const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
+    await tx3.wait(); 
+    const tx4 = await AnemonethContract.connect(user4).register('test', {value: 1000000000}); // 1 Gwei
+    await tx4.wait(); 
+    const tx5 = await AnemonethContract.connect(user5).register('test', {value: 1000000000}); // 1 Gwei
+    await tx5.wait();
+
+  });
+
+  describe("Distribution", function() { 
+    it("Contract address should have 9995 CLWN before weekly mint", async function () {       
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(9995);
+    });
+    it("Contract address should have 10004 CLWN after first weekly mint", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
+      await AnemonethContract.connect(owner).weeklyMint();   
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(10004);
+    });
+    it("CLWN should be distributed to those who earned in week 1", async function () {    
+      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
+      await AnemonethContract.connect(owner).weeklyMint();   
+      const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClWNBalance).to.equal(10004);
+    });
+  })
+})
