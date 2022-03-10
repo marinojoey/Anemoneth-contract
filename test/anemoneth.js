@@ -13,7 +13,7 @@ chai.use(solidity);
 
 
 describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", function () {
-
+  // Keeping so that we can de-bug specific functions more easily
   let AnemonethV1;
   let owner;
   let user1;
@@ -71,8 +71,6 @@ describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", func
   })
   describe("WeeksEarners for 5 users", function() {
     before( async function() { 
-      // const tx1 = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
-      // await tx1.wait(); // user registered in last describe block. toggle if needed
       const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
       await tx2.wait(); 
       const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
@@ -104,10 +102,6 @@ describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", func
       const historicalEarnings = await AnemonethContract.gethistoricalEarnings(0, user5.address);
       expect(historicalEarnings).to.equal(3);
     });
-    // it("Nested mapping should work for all 5 accounts", async function () {        
-      
-    //   expect(userCount).to.equal(5);
-    // });
     it("Should push earnings into weeklyInfoArr for the second time", async function () {    
       await AnemonethContract.connect(owner).weeklyEarnings([user5.address, user2.address], [user3.address, user4.address], [user1.address]);    
       const weeklyInfoArr = await AnemonethContract.getWeeklyInfoArrLength();
@@ -121,6 +115,7 @@ describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", func
 });
 
 describe.skip("Anemoneth contract instance 2, minting", function () { 
+  // Keeping so that we can de-bug specific functions more easily
   let AnemonethV1;
   let owner;
   let user1;
@@ -152,12 +147,6 @@ describe.skip("Anemoneth contract instance 2, minting", function () {
 
   });
 
-  describe.skip("Registration", function() {
-    // This works, but the UX needs to be improved. Weird error.
-      it("Should not allow user to register twice", async function () {        
-        expect(await AnemonethContract.connect(user1).register('test', {value: 1000000000})).to.be.revertedWith("Account already registered!");
-      });
-  })
   describe("Minting", function() { 
     it("Contract address should have 9995 CLWN before weekly mint", async function () {       
       const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
@@ -178,7 +167,8 @@ describe.skip("Anemoneth contract instance 2, minting", function () {
   })
 })
 
-describe("Anemoneth contract instance 3, distribution", function () { 
+describe.skip("Anemoneth contract instance 3, distribution", function () { 
+  // Keeping so that we can de-bug specific functions more easily
   let AnemonethV1;
   let owner;
   let user1;
@@ -237,7 +227,7 @@ describe("Anemoneth contract instance 3, distribution", function () {
   })
 })
 
-describe("Anemoneth contract instance 4, settleUp", function () { 
+describe.only("Anemoneth contract instance 4, settleUp", function () { 
   let AnemonethV1;
   let owner;
   let user1;
@@ -245,10 +235,11 @@ describe("Anemoneth contract instance 4, settleUp", function () {
   let user3;
   let user4;
   let user5;
+  let user6;
   let AnemonethContract;
   
   before(async function() {
-    [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
+    [owner, user1, user2, user3, user4, user5, user6] = await ethers.getSigners();
 
     AnemonethV1 = await ethers.getContractFactory("AnemonethV1");
 
@@ -269,15 +260,94 @@ describe("Anemoneth contract instance 4, settleUp", function () {
     await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [user5.address], [user1.address, user2.address, user3.address, user4.address, user5.address]);
 
   });
-  describe("settleUp", function() {
-    it("Weekly operations should happen in one contract call", async function () {
+  describe("First week", function() {
+    it("Should not allow user to register twice", async function () {        
+      await expect(AnemonethContract.connect(user1).register('test', {value: 1000000000})).to.be.revertedWith("Account already registered!");
+    });
+    it("weeklyInfoArr should have one week added", async function () {
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
+      expect(weekNumber).to.equal(1);
+    });
+    it("Users should have a correct distribution", async function () {
       const user1Balance = await AnemonethContract.balanceOf(user1.address);
       expect(user1Balance).to.equal(2);
     });
-    it("Weekly operations should happen in one contract call", async function () {
+    it("Users should have a correct distribution", async function () {
       const user5Balance = await AnemonethContract.balanceOf(user5.address);
       expect(user5Balance).to.equal(4);
     });
+    it("Contract CLWN balance should not change", async function () {
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(9995);
+    });
+    it("mintViaOwner function should work for only the owner", async function () {
+      await expect(AnemonethContract.connect(user1).mintViaOwner(1)).to.be.reverted;
+    });
+    it("mintViaOwner should work for the owner", async function () {
+      await AnemonethContract.connect(owner).mintViaOwner(1)
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(9996);
+    });
+    it("mintViaOwner should work for the owner for a big number", async function () {
+      await AnemonethContract.connect(owner).mintViaOwner(1000)
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(10996);
+    });
+  })
 
+  describe("Second week", function() {
+    before(async function() {
+      const tx6 = await AnemonethContract.connect(user6).register('test', {value: 1000000000}); // 1 Gwei
+      await tx6.wait();
+      await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [user5.address, user6.address], [user1.address, user2.address, user3.address, user4.address, user5.address, user6.address]);
+    })
+    it("weeklyInfoArr should have one week added", async function () {
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
+      expect(weekNumber).to.equal(2);
+    });
+    it("User 6 should be properly added and distributed to", async function () {
+      const user6Balance = await AnemonethContract.balanceOf(user6.address);
+      expect(user6Balance).to.equal(4);
+    });
+    it("User 5 should be properly distributed to", async function () {
+      const user5Balance = await AnemonethContract.balanceOf(user5.address);
+      expect(user5Balance).to.equal(7);
+    });
+    it("Contract CLWN balance should only be one less as a result of user6", async function () {
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(10995);
+    });
+  })
+  describe("Working w/ empty earning tier + non-earning users", function() {
+    before(async function() {
+      await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [], [user1.address, user2.address, user3.address, user4.address]);
+    })
+    it("weeklyInfoArr should have one week added", async function () {
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
+      expect(weekNumber).to.equal(3);
+    });
+    it("Only those that earned should be processed in settleUp", async function () {
+      // Note: must be removed from _allEarners and _weeklyTierEarners arrays in settleUp
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyEarnersCount();
+      expect(weekNumber).to.equal(4);
+    });
+  })
+  describe("Non-Active week", function() {
+    before(async function() {
+      await AnemonethContract.connect(owner).settleUp([], [], [], []);
+    })
+    it("weeklyInfoArr should have one week added", async function () {
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
+      expect(weekNumber).to.equal(4);
+    });
+    it("Only those that earned should be processed in settleUp", async function () {
+      // Note: must be removed from _allEarners and _weeklyTierEarners arrays in settleUp
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyEarnersCount();
+      expect(weekNumber).to.equal(0);
+    });
+    it("Contract CLWN balance should not change", async function () {
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(10995);
+    });
   })
 });

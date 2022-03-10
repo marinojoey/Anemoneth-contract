@@ -65,6 +65,9 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     function getWeeklyInfoArrLength() external view returns(uint) {
         return weeklyInfoArr.length;
     }
+    function getWeeklyEarnersCount() external view returns(uint) {
+        return weeklyInfoArr[weeklyInfoArr.length-1].payableAddr.length;
+    }
     function isRegistered(address addr) external view returns(bool) {
         return usersMap[addr].isUser;
     }
@@ -107,8 +110,8 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         weeklyMint();
         distribute();
     }
-    function mintViaOwner() external onlyOwner {
-        _mint(address(this), 10000);
+    function mintViaOwner(uint256 _num) external onlyOwner {
+        _mint(address(this), _num);
     }
     // catch for Ether
     receive() external payable {}
