@@ -11,13 +11,14 @@ function App() {
   const [userAddress, setUserAddress] = useState("");
 
   return (
-    <AuthContext.Provider value={{ authenticated, setAuthenticated, userAddress, setUserAddress }}>
-      <Router>
-        <Routes>
-          <Route path="/" element={(authenticated && userAddress) ? <Homepage /> : <Login />} />
-        </Routes>
-      </Router>
-    </AuthContext.Provider>
+    // <AuthContext.Provider value={{ authenticated, setAuthenticated, userAddress, setUserAddress }}>
+    //   <Router>
+    //     <Routes>
+    //       <Route path="/" element={(authenticated && userAddress) ? <Homepage /> : <Login />} />
+    //     </Routes>
+    //   </Router>
+    // </AuthContext.Provider>
+    <Homepage />
   );
 }
 
