@@ -36,7 +36,7 @@ class LoginRegister extends React.Component {
     registerCall = async () => {
         let instance = contractCall();
         const username = document.querySelector('.usrnm').value;
-        await instance.register(username, { value: ethers.utils, gasLimit: 125000 });
+        await instance.register(username, { value: ethers.utils.parseUnits('1', 'gwei'), gasLimit: 125000 });
     }
     render() {
         if(!this.state.connected) {

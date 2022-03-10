@@ -7,18 +7,16 @@ import Homepage from './components/Homepage/Homepage';
 export const AuthContext = createContext();
 
 function App() {
-  const [authenticated, setAuthenticated] = useState(false);
   const [userAddress, setUserAddress] = useState("");
 
   return (
-    // <AuthContext.Provider value={{ authenticated, setAuthenticated, userAddress, setUserAddress }}>
-    //   <Router>
-    //     <Routes>
-    //       <Route path="/" element={(authenticated && userAddress) ? <Homepage /> : <Login />} />
-    //     </Routes>
-    //   </Router>
-    // </AuthContext.Provider>
-    <Homepage />
+    <AuthContext.Provider value={{ userAddress, setUserAddress }}>
+      <Router>
+        <Routes>
+          <Route path="/" element={(userAddress) ? <Homepage /> : <Login />} />
+        </Routes>
+      </Router>
+    </AuthContext.Provider>
   );
 }
 
