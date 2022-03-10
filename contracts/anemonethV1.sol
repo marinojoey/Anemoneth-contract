@@ -24,7 +24,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
 
     struct WeeklyInfo {
         uint weekNumber;
-        uint256 weeksEarnersCount;
+        uint256 weeksEarnersCount; // TODO: delete
         uint weeksNem;
         address[] payableAddr;
     }
@@ -69,49 +69,42 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         return usersMap[addr].isUser;
     }
     // _weeksArr will be formulated based on only those THAT EARNED that week
-    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external {
+    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners, address[] memory _allEarners) internal {
         uint256 _sum;
-        address[] memory _weeksArr;
-        uint256 _totalEarners = _weeksLowEarners.length + _weeksMidEarners.length + _weeksHighEarners.length;
-        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _totalEarners, 0, _weeksArr);
         for (uint256 i=0; i<_weeksLowEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksLowEarners[i]] = 1;
             _sum += 1;
-            _weeksArr.push(_weeksLowEarners[i]);
         }
         for (uint256 i=0; i<_weeksMidEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksMidEarners[i]] = 2;
             _sum += 2;
-            _weeksArr.push(_weeksMidEarners[i]);
         }
         for (uint256 i=0; i<_weeksHighEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksHighEarners[i]] = 3;
             _sum += 3;
-            _weeksArr.push(_weeksHighEarners[i]);
         }
-        thisWeek.weeksNem = _sum;
+        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _allEarners.length, _sum, _allEarners);
         // require( (thisWeek.weekNumber >= ( (weeklyInfoArr[weeklyInfoArr.length-1].weekNumber) + 1 weeks )) || weeklyInfoArr.length == 0);
         weeklyInfoArr.push(thisWeek);
     }
 
-    function weeklyMint() external {
+    function weeklyMint() internal {
         // mint enough NEM to cover weeklyEarnings() and possibly estimated tx fees
         // check that weeklyEarnings() completed already
         _mint(address(this), weeklyInfoArr[weeklyInfoArr.length-1].weeksNem);
     }
     function distribute() internal {
-        uint256 _totalEarners = weeklyInfoArr[weeklyInfoArr.length-1].weeksEarnersCount;
-        for (uint i=0; i<_totalEarners; i++) {
-            address to = users[i].addr;
-            uint weekNumber = weeklyInfoArr[weeklyInfoArr.length].weekNumber;
-            uint amount = historicalEarnings[weekNumber][users[i].addr];
+        WeeklyInfo memory _thisWeeks = weeklyInfoArr[weeklyInfoArr.length-1];
+        for (uint i=0; i<_thisWeeks.payableAddr.length; i++) {
+            address to = _thisWeeks.payableAddr[i];
+            uint amount = historicalEarnings[_thisWeeks.weekNumber][to];
             _transfer(address(this), to, amount);
         }
     }
 
-    function settleUP() external onlyOwner {
-        // weeklyEarnings(address[] memory, uint8[] memory);
-        // weeklyMint();
+    function settleUp(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners, address[] memory _allEarners) external onlyOwner {
+        weeklyEarnings(_weeksLowEarners, _weeksMidEarners, _weeksHighEarners, _allEarners);
+        weeklyMint();
         distribute();
     }
     function mintViaOwner() external onlyOwner {

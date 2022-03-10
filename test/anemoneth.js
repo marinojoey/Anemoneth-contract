@@ -5,6 +5,13 @@ const { solidity } = require("ethereum-waffle");
 
 chai.use(solidity);
 
+
+// VISIBILIITY OF WEEKLYEARNINGS/WEEKLYMINT/DISTRIBUTE/SETTLEUP MUST BE ALTERED TO PASS 1,2 AND 3
+
+// CURRENT VISIBILITY WILL ONLY WORK FOR 4
+
+
+
 describe.skip("Anemoneth contract instance 1, register and weeklyEarnings", function () {
 
   let AnemonethV1;
@@ -203,22 +210,74 @@ describe("Anemoneth contract instance 3, distribution", function () {
 
   });
 
-  describe("Distribution", function() { 
+  describe.skip("Distribution", function() { 
     it("Contract address should have 9995 CLWN before weekly mint", async function () {       
       const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
       expect(contractClWNBalance).to.equal(9995);
     });
     it("Contract address should have 10004 CLWN after first weekly mint", async function () {    
-      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
+      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address], [user1.address, user2.address, user3.address, user4.address, user5.address]);
       await AnemonethContract.connect(owner).weeklyMint();   
       const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
       expect(contractClWNBalance).to.equal(10004);
     });
-    it("CLWN should be distributed to those who earned in week 1", async function () {    
-      await AnemonethContract.connect(owner).weeklyEarnings([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
-      await AnemonethContract.connect(owner).weeklyMint();   
+    it("CLWN should be distributed to those who earned in week 1 from Contract", async function () {    
+      await AnemonethContract.connect(owner).distribute();
       const contractClWNBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
-      expect(contractClWNBalance).to.equal(10004);
+      expect(contractClWNBalance).to.equal(9995);
+    });
+    it("User5 should have the expected increase of CLWN", async function () {
+      const user5Balance = await AnemonethContract.balanceOf(user5.address);
+      expect(user5Balance).to.equal(4);
+    });
+    it("User1 should have the expected increase of CLWN", async function () {
+      const user1Balance = await AnemonethContract.balanceOf(user1.address);
+      expect(user1Balance).to.equal(2);
     });
   })
 })
+
+describe("Anemoneth contract instance 4, settleUp", function () { 
+  let AnemonethV1;
+  let owner;
+  let user1;
+  let user2;
+  let user3;
+  let user4;
+  let user5;
+  let AnemonethContract;
+  
+  before(async function() {
+    [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
+
+    AnemonethV1 = await ethers.getContractFactory("AnemonethV1");
+
+    AnemonethContract = await upgrades.deployProxy(AnemonethV1, ["anemoneth", "CLWN", 9000000000000, 10000]);
+
+    await AnemonethContract.deployed();
+
+    const tx = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
+    await tx.wait();
+    const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
+    await tx2.wait(); 
+    const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
+    await tx3.wait(); 
+    const tx4 = await AnemonethContract.connect(user4).register('test', {value: 1000000000}); // 1 Gwei
+    await tx4.wait(); 
+    const tx5 = await AnemonethContract.connect(user5).register('test', {value: 1000000000}); // 1 Gwei
+    await tx5.wait();
+    await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [user5.address], [user1.address, user2.address, user3.address, user4.address, user5.address]);
+
+  });
+  describe("settleUp", function() {
+    it("Weekly operations should happen in one contract call", async function () {
+      const user1Balance = await AnemonethContract.balanceOf(user1.address);
+      expect(user1Balance).to.equal(2);
+    });
+    it("Weekly operations should happen in one contract call", async function () {
+      const user5Balance = await AnemonethContract.balanceOf(user5.address);
+      expect(user5Balance).to.equal(4);
+    });
+
+  })
+});
