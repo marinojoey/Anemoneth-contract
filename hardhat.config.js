@@ -10,7 +10,7 @@ module.exports = {
   gasReporter: {
     currency: 'USD',
     coinmarketcap: process.env.COINMARKET_KEY,
-    gasPriceApi: process.env.ETHERSCAN_KEY
+    gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice"
   },
   networks: {
     rinkeby: {

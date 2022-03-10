@@ -332,22 +332,22 @@ describe.only("Anemoneth contract instance 4, settleUp", function () {
       expect(weekNumber).to.equal(4);
     });
   })
-  // describe("Non-Active week", function() {
-  //   before(async function() {
-  //     await AnemonethContract.connect(owner).settleUp([], [], [], []);
-  //   })
-  //   it("weeklyInfoArr should have one week added", async function () {
-  //     const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
-  //     expect(weekNumber).to.equal(4);
-  //   });
-  //   it("Only those that earned should be processed in settleUp", async function () {
-  //     // Note: must be removed from _allEarners and _weeklyTierEarners arrays in settleUp
-  //     const weekNumber = await AnemonethContract.connect(owner).getWeeklyEarnersCount();
-  //     expect(weekNumber).to.equal(0);
-  //   });
-  //   it("Contract CLWN balance should not change", async function () {
-  //     const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
-  //     expect(contractClwnBalance).to.equal(10995);
-  //   });
-  // })
+  describe("Non-Active week", function() {
+    before(async function() {
+      await AnemonethContract.connect(owner).settleUp([], [], [], []);
+    })
+    it("weeklyInfoArr should have one week added", async function () {
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyInfoArrLength();
+      expect(weekNumber).to.equal(4);
+    });
+    it("Only those that earned should be processed in settleUp", async function () {
+      // Note: must be removed from _allEarners and _weeklyTierEarners arrays in settleUp
+      const weekNumber = await AnemonethContract.connect(owner).getWeeklyEarnersCount();
+      expect(weekNumber).to.equal(0);
+    });
+    it("Contract CLWN balance should not change", async function () {
+      const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
+      expect(contractClwnBalance).to.equal(10995);
+    });
+  })
 });
