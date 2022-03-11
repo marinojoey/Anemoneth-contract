@@ -35,24 +35,18 @@ async function retrieveFiles(cid) {
   let fileText = await file.text();
   console.log(fileText)
 }
-console.log(isUser + "in Homepage.js")
-console.log(connected + "in Homepage.js")
-console.log(addrblnc + "in Homepage.js")
 
 
   return (
-      <>    
+      <div className='root'>    
         <h1>HOMEPAGE</h1>
-        <h3>Your {status} wallets balance is: {addrblnc}</h3>
-        <h3>Address: {addr1} </h3>
         <label htmlFor='str' className='strlbl'></label>
         <input type="text" className='str' placeholder='web3.storage'></input>
         <button className='stringbtn' onClick={ storeFiles }>Post</button>
         <br/>
         <input type="text" className='cid' placeholder='Content Identifier'></input>
         <button className='retrieve' onClick={ () => retrieveFiles(document.querySelector('.cid').value) }>Retrieve</button>
-        <div className='respone'></div>
-      </>
+      </div>
   )
 }
 

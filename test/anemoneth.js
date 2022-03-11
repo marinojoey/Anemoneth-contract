@@ -249,7 +249,7 @@ describe.only("Anemoneth contract instance 4, settleUp", function () {
 
     const tx = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
     await tx.wait();
-    const tx2 = await AnemonethContract.connect(user2).register('test', {value: 1000000000}); // 1 Gwei
+    const tx2 = await AnemonethContract.connect(user2).register('CANIGETTHIS', {value: 1000000000}); // 1 Gwei
     await tx2.wait(); 
     const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
     await tx3.wait(); 
@@ -292,6 +292,14 @@ describe.only("Anemoneth contract instance 4, settleUp", function () {
       await AnemonethContract.connect(owner).mintViaOwner(1000)
       const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
       expect(contractClwnBalance).to.equal(10996);
+    });
+    it("should be able to return userNames", async function () {
+      const userName = await AnemonethContract.connect(user2).getUserName(user2.address)
+      expect(userName).to.equal("CANIGETTHIS");
+    });
+    it("should be able to return userNames", async function () {
+      const userName = await AnemonethContract.connect(user1).getUserName(user1.address)
+      expect(userName).to.equal("test");
     });
   })
 

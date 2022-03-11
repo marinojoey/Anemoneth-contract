@@ -2,7 +2,7 @@
 We are a **Decentralized** social media platform
 
 ## Rinkerscan Links
-Proxy: https://rinkeby.etherscan.io/address/0x35E49d902301A1e9D081aFa6b404101cD37F6c8d#code 
+Proxy: https://rinkeby.etherscan.io/address/0x70649c7b44ab1177EF8c058379ba975d78735378
 
 Implementation: https://rinkeby.etherscan.io/address/0x7ca2ac30055340825587dbe6d88dc59345b4a6cc#code
  

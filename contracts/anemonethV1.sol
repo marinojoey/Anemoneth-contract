@@ -56,6 +56,9 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     function getUser(uint256 index) external view returns(address) {
         return users[index].addr;
     }
+    function getUserName(address _addr) external view returns(string memory) {
+        return usersMap[_addr].username;
+    }
     function getUserCount() external view returns(uint) {
         return users.length;
     }
