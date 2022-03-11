@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.scss";
-// import { AuthContext } from "../../App";
-// import PopUp from "../PopUp/PopUp";
 import { ethers } from "ethers";
 import contractCall from "../ContractCall/ContractCall";
 const { ethereum } = window;
 
-
-function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, setUsername, connected }) {
+function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, setUsername, connected, addr1 }) {
     let displayAddr;
     let username;
     let provider;
@@ -15,23 +13,9 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
     let addr;
 
 
-    async function getClwnBalance() {
-        let contractInstance = await contractCall();
-        let balanceOf = parseInt(await contractInstance.balanceOf(addr), 16);
-        setclwnblnc(balanceOf);
-    }
-    function makeDispAddr(numAddr) {
-        const strAddr = numAddr.toString();
-        const first = strAddr.slice(0,4);
-        const last = strAddr.slice(-4);
-        displayAddr = `${first}...${last}`;
-        setDispAddr(displayAddr);
-    }
-    async function getUsername() {
-        let contractInstance = await contractCall();
-        username = await contractInstance.getUserName(addr)
-        setUsername(username);
-    }
+    useEffect(() => {
+        connectWalletHandler();
+    }, [])
 
     async function connectWalletHandler() {
         if (ethereum) {
@@ -39,21 +23,32 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
             provider = new ethers.providers.Web3Provider(ethereum);
             signer = await provider.getSigner();
             addr = await signer.getAddress();
-
-            getUsername(addr);
             makeDispAddr(addr);
             setAddr1(addr);
             setConn(true);
-
-            let contractInstance = await contractCall();
-            if (await contractInstance.isRegistered(addr)) {
-                setUser(true)
-            }
-            getClwnBalance();
         } 
         else {
             alert("Please install MetaMask to connect your wallet and try again");
         }
+    }
+
+    function makeDispAddr(numAddr) {
+        const strAddr = numAddr.toString();
+        const first = strAddr.slice(0,4);
+        const last = strAddr.slice(-4);
+        displayAddr = `${first}...${last}`;
+        setDispAddr(displayAddr);
+    }
+
+    async function contractCallHandler() {
+        let contractInstance = await contractCall();
+        if (await contractInstance.isRegistered(addr1)) {
+            setUser(true)
+            let balanceOf = parseInt(await contractInstance.balanceOf(addr1), 16);
+            setclwnblnc(balanceOf);
+            username = await contractInstance.getUserName(addr1)
+            setUsername(username);
+        } else console.log("Please register")
     }
 
     async function registerCall() {
@@ -71,8 +66,8 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
                         <h4>Connect with friends and the decentralised world around you on Anemoneth</h4>
                     </div>
                     <div className='loginPieces'>
-                        <button id="cnctbtn" className="loginButtons" onClick={connectWalletHandler}>Connect Wallet</button>
-                        {/* <button id="calltbtn" className="loginButtons" onClick={contractCallHandler}>Enter the Anemone</button> */}
+                        <div>We are attempting to connect to your metamask account.</div>
+                        <div>Please make sure you have metamask installed</div>
                     </div>
                 </div>
             </div>
@@ -87,11 +82,14 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
                         <h4>Connect with friends and the decentralised world around you on Anemoneth</h4>
                     </div>
                     <div className='loginPieces'>
-                        <div>Wallet Connected!</div>
+                        <div>Already registered?</div>
                         <br></br>
-                        <div>Now you get to register!</div>
+                        <button id="calltbtn" className="loginButtons" onClick={contractCallHandler}>Enter the Anemone</button>
                         <br></br>
-                        <div>It will cost 1 Gwei and you will recieve 1 CLWN in return.</div>
+                        <br></br>
+                        <div>If not,</div>
+                        <br></br>
+                        <div>It will cost 1 Gwei (+ gas) and you will recieve 1 CLWN in return.</div>
                         <br></br>
                         <div className='usrnmwrapper'>
                             <label htmlFor='usrnm' className='usrnmlbl'> Username: </label>

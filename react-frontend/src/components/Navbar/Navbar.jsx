@@ -2,7 +2,7 @@ import './navbar.scss'
 import React from 'react'
 
 
-function Navbar( { clwnblnc, dispAddr, username } ) {
+function Navbar( { clwnblnc, dispAddr, username, connected } ) {
 
   return (
     <div className='navbar ' id="navbar">

@@ -20,14 +20,14 @@ function App() {
 
   return (
     <>
-    <Navbar isUser={isUser} connected={connected} addr1={addr1} clwnblnc={clwnblnc} dispAddr={dispAddr} username={username} />
+    <Navbar clwnblnc={clwnblnc} dispAddr={dispAddr} username={username} connected={connected} />
     <AuthContext.Provider value={isUser}>
       <Router>
         <Routes>
           <Route path="/" 
             element = { (isUser) ? 
               <Homepage isUser={isUser} connected={connected} addr1={addr1} /> : 
-              <Login setUser={setUser} setConn={setConn} setAddr1={setAddr1} setclwnblnc={setclwnblnc} setDispAddr={setDispAddr} setUsername={setUsername} connected={connected} />} />
+              <Login setUser={setUser} setConn={setConn} setAddr1={setAddr1} setclwnblnc={setclwnblnc} setDispAddr={setDispAddr} setUsername={setUsername} addr1={addr1} connected={connected} />} />
         </Routes>
       </Router>
     </AuthContext.Provider>
