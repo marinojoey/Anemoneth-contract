@@ -7,6 +7,7 @@ let web3s = new Web3Storage({
 });
 
 let fileName = 'plain-utf8.txt'
+
 async function storeFiles() {
   const string = document.querySelector('.str').value;
   const file = new File([string], fileName);
@@ -28,6 +29,7 @@ async function retrieveFiles(cid) {
 }
 
 function Homepage() {
+  // console.log(addr1)
   return (
       <>    
         <h1>HOMEPAGE</h1>
