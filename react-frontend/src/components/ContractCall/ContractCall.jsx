@@ -12,7 +12,7 @@ function contractCall() {
     provider = new ethers.providers.Web3Provider(ethereum);
     signer = provider.getSigner();
     contractInstance = new ethers.Contract(anemonethProxyAddress, anemonethJSON.abi, signer);
-    return contractInstance; 
+    return contractInstance;
 }
 
 export default contractCall;

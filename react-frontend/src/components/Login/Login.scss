@@ -1,5 +1,19 @@
 @import "../../global.scss";
 
+#LoginRegisterComponent {
+    // background-color: $ethblack;
+    // padding: 4% 2% 4% 2%;
+    text-align: center;
+
+    .loginButtons {
+        // width: 660px;
+        width: 90%;
+        background-color: $ethpurple;
+        border: none;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+}
 .loginpage {
     padding-top: 74px;
     background-color: $ethgray;
