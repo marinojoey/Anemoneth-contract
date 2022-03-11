@@ -8,15 +8,13 @@ import Login from './components/Login/Login'
 export const AuthContext = createContext();
 
 function App() {
-
   const [isUser, setUser] = useState(false);
-  console.log(isUser)
 
   return (
     <AuthContext.Provider value={isUser}>
       <Router>
         <Routes>
-          <Route path="/" element={(isUser) ? <Homepage /> : <Login setUser={setUser}/>} />
+          <Route path="/" element={(isUser) ? <Homepage /> : <Login setUser={setUser} />} />
         </Routes>
       </Router>
     </AuthContext.Provider>

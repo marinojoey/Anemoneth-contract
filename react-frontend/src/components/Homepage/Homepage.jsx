@@ -28,7 +28,6 @@ async function retrieveFiles(cid) {
 }
 
 function Homepage() {
-  // ( () => { makeStorageClient() }) ();;
   return (
       <>    
         <h1>HOMEPAGE</h1>
