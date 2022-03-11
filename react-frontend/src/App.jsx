@@ -13,7 +13,6 @@ function App() {
   const [connected, setConn] = useState(false);
   const [addr1, setAddr1] = useState(0);
   const [dispAddr, setDispAddr] = useState("")
-  const [addrblnc, setblnc] = useState(0);
   const [clwnblnc, setclwnblnc] = useState(0)
   const [username, setUsername] = useState("")
 
@@ -21,14 +20,14 @@ function App() {
 
   return (
     <>
-    <Navbar isUser={isUser} connected={connected} addr1={addr1} addrblnc={addrblnc} clwnblnc={clwnblnc} dispAddr={dispAddr} username={username} />
+    <Navbar isUser={isUser} connected={connected} addr1={addr1} clwnblnc={clwnblnc} dispAddr={dispAddr} username={username} />
     <AuthContext.Provider value={isUser}>
       <Router>
         <Routes>
           <Route path="/" 
             element = { (isUser) ? 
-              <Homepage isUser={isUser} connected={connected} addr1={addr1} addrblnc={addrblnc} /> : 
-              <Login setUser={setUser} setConn={setConn} setAddr1={setAddr1} setblnc={setblnc} setclwnblnc={setclwnblnc} setDispAddr={setDispAddr} setUsername={setUsername} connected={connected} />} />
+              <Homepage isUser={isUser} connected={connected} addr1={addr1} /> : 
+              <Login setUser={setUser} setConn={setConn} setAddr1={setAddr1} setclwnblnc={setclwnblnc} setDispAddr={setDispAddr} setUsername={setUsername} connected={connected} />} />
         </Routes>
       </Router>
     </AuthContext.Provider>

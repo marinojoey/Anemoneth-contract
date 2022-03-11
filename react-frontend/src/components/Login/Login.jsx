@@ -9,28 +9,28 @@ const { ethereum } = window;
 
 function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, setUsername, connected }) {
     let displayAddr;
-    let addrBalance;
     let username;
     let provider;
     let signer;
     let addr;
 
 
-    async function getCLWNBlnc() {
+    async function getClwnBalance() {
         let contractInstance = await contractCall();
         let balanceOf = parseInt(await contractInstance.balanceOf(addr), 16);
         setclwnblnc(balanceOf);
     }
-    function presentAddr(numAddr) {
+    function makeDispAddr(numAddr) {
         const strAddr = numAddr.toString();
         const first = strAddr.slice(0,4);
         const last = strAddr.slice(-4);
         displayAddr = `${first}...${last}`;
+        setDispAddr(displayAddr);
     }
     async function getUsername() {
         let contractInstance = await contractCall();
         username = await contractInstance.getUserName(addr)
-        console.log(username)
+        setUsername(username);
     }
 
     async function connectWalletHandler() {
@@ -39,19 +39,17 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
             provider = new ethers.providers.Web3Provider(ethereum);
             signer = await provider.getSigner();
             addr = await signer.getAddress();
-            addrBalance = ethers.utils.formatEther(await provider.getBalance(addr));
+
             getUsername(addr);
-            setUsername(username);
-            presentAddr(addr);
-            setDispAddr(displayAddr)
+            makeDispAddr(addr);
             setAddr1(addr);
-            setblnc(addrBalance);
             setConn(true);
+
             let contractInstance = await contractCall();
             if (await contractInstance.isRegistered(addr)) {
                 setUser(true)
             }
-            getCLWNBlnc();
+            getClwnBalance();
         } 
         else {
             alert("Please install MetaMask to connect your wallet and try again");
@@ -74,6 +72,7 @@ function Login({ setUser, setConn, setAddr1, setblnc, setclwnblnc, setDispAddr, 
                     </div>
                     <div className='loginPieces'>
                         <button id="cnctbtn" className="loginButtons" onClick={connectWalletHandler}>Connect Wallet</button>
+                        {/* <button id="calltbtn" className="loginButtons" onClick={contractCallHandler}>Enter the Anemone</button> */}
                     </div>
                 </div>
             </div>
