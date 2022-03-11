@@ -7,10 +7,10 @@ import contractCall from "../ContractCall/ContractCall";
 const { ethereum } = window;
 
 
-function Login({ setUser }) {
-    const [connected, toggleConn] = useState(false);
-    const [addr1, setAddr1] = useState(0);
-    const [addrblnc, setBLNC] = useState(0)
+function Login({ setUser, setConn, setAddr1, setblnc }) {
+    // const [connected, setConn] = useState(false);
+    // const [addr1, setAddr1] = useState(0);
+    // const [addrblnc, setblnc] = useState(0);
 
     let addrBalance;
     let provider;
@@ -27,8 +27,8 @@ function Login({ setUser }) {
             addr = await signer.getAddress();
             addrBalance = ethers.utils.formatEther(await provider.getBalance(addr));
             setAddr1(addr);
-            setBLNC(addrBalance);
-            toggleConn(true);
+            setblnc(addrBalance);
+            setConn(true);
             let contractInstance = await contractCall();
             
             if (await contractInstance.isRegistered(addr)) {
