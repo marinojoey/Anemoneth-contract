@@ -161,4 +161,22 @@ describe("Anemoneth contract instance 4, settleUp", function () {
       expect(user1Allocation).to.equal(11018);
     });
   })
+  describe("User1 tipping User2 1 CLWN", async function() {
+    before(async function() {
+      await AnemonethContract.connect(user1).transfer(user2.address, 1)
+    });
+    it("Should decrease User1 balance by 1", async function () {
+      const balanceOfUser1 = await AnemonethContract.balanceOf(user1.address)
+      expect(balanceOfUser1).to.equal(4);
+    });
+    it("Should increase User2 balance by 1 (before their redemption)", async function () {
+      const balanceOfUser2 = await AnemonethContract.balanceOf(user2.address)
+      expect(balanceOfUser2).to.equal(2);
+    });
+    it("After redemption User2 should have 7 tokens", async function () {
+      await AnemonethContract.connect(user2).redeem(user2.address);
+      const user2Redeemed = await AnemonethContract.balanceOf(user2.address)
+      expect(user2Redeemed).to.equal(6);
+    });
+  });
 });
