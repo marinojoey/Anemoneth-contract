@@ -15,18 +15,15 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         string username;
         uint joinDate;
         bool isUser;
+        uint256 currRedeemable;
     }
-    User[] users;
-    mapping(address => User) usersMap;
-
     // user weekNumber => address => weeklyEarning
-    mapping(uint => mapping(address => uint)) historicalEarnings;
+    mapping(uint => mapping(address => uint)) historicalEarnings; // Must be immutable, So we need a seperate tally for curr redeemable
+    mapping(address => User) usersMap;
 
     struct WeeklyInfo {
         uint weekNumber;
-        uint256 weeksEarnersCount; // TODO: delete
         uint weeksNem;
-        address[] payableAddr;
     }
     // I would really like to not use this. Expensive. Does historicalEarnings mapping accomplish
     WeeklyInfo[] weeklyInfoArr;
@@ -48,48 +45,51 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         require(msg.value == 1 gwei);
         require(usersMap[msg.sender].isUser == false, "Account already registered!");
         _transfer(address(this), msg.sender, 1);
-        User memory newUser = User({ addr: msg.sender, username: _username, joinDate: block.timestamp, isUser: true});
-        users.push(newUser);
+        User memory newUser = User({ addr: msg.sender, username: _username, joinDate: block.timestamp, isUser: true, currRedeemable: 1 });
         usersMap[msg.sender] = newUser;
     }
-
-    function getUser(uint256 index) external view returns(address) {
-        return users[index].addr;
+    function getTotalEarned(address _addr) external view returns(uint) {
+        uint256 weekCount = weeklyInfoArr.length;
+        uint256 sum;
+        for (uint i=0; i<weekCount; i++) {
+           sum += historicalEarnings[i][_addr];
+        }
+        return sum;
+    }
+    function getCurrRedeemable(address _addr) external view returns(uint) {
+        return usersMap[_addr].currRedeemable;
     }
     function getUserName(address _addr) external view returns(string memory) {
         return usersMap[_addr].username;
     }
-    function getUserCount() external view returns(uint) {
-        return users.length;
-    }
     function gethistoricalEarnings(uint _week, address _addr) external view returns(uint) {
         return historicalEarnings[_week][_addr];
     }
-    function getWeeklyInfoArrLength() external view returns(uint) {
+    function getWeekCount() external view returns(uint) {
         return weeklyInfoArr.length;
-    }
-    function getWeeklyEarnersCount() external view returns(uint) {
-        return weeklyInfoArr[weeklyInfoArr.length-1].payableAddr.length;
     }
     function isRegistered(address addr) external view returns(bool) {
         return usersMap[addr].isUser;
     }
     // _weeksArr will be formulated based on only those THAT EARNED that week
-    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners, address[] memory _allEarners) internal {
-        uint256 _sum;
+    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) internal {
+        uint256 _sum = 0;
         for (uint256 i=0; i<_weeksLowEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksLowEarners[i]] = 1;
+            usersMap[_weeksLowEarners[i]].currRedeemable += 1;
             _sum += 1;
         }
         for (uint256 i=0; i<_weeksMidEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksMidEarners[i]] = 2;
+            usersMap[_weeksMidEarners[i]].currRedeemable += 2;
             _sum += 2;
         }
         for (uint256 i=0; i<_weeksHighEarners.length; i++) {
             historicalEarnings[weeklyInfoArr.length][_weeksHighEarners[i]] = 3;
+            usersMap[_weeksHighEarners[i]].currRedeemable += 3;
             _sum += 3;
         }
-        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _allEarners.length, _sum, _allEarners);
+        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _sum);
         // require( (thisWeek.weekNumber >= ( (weeklyInfoArr[weeklyInfoArr.length-1].weekNumber) + 1 weeks )) || weeklyInfoArr.length == 0);
         weeklyInfoArr.push(thisWeek);
     }
@@ -99,19 +99,17 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         // check that weeklyEarnings() completed already
         _mint(address(this), weeklyInfoArr[weeklyInfoArr.length-1].weeksNem);
     }
-    function distribute() internal {
-        WeeklyInfo memory _thisWeeks = weeklyInfoArr[weeklyInfoArr.length-1];
-        for (uint i=0; i<_thisWeeks.payableAddr.length; i++) {
-            address to = _thisWeeks.payableAddr[i];
-            uint amount = historicalEarnings[_thisWeeks.weekNumber][to];
-            _transfer(address(this), to, amount);
-        }
+
+    function settleUp(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external onlyOwner {
+        weeklyEarnings(_weeksLowEarners, _weeksMidEarners, _weeksHighEarners);
+        weeklyMint();
     }
 
-    function settleUp(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners, address[] memory _allEarners) external onlyOwner {
-        weeklyEarnings(_weeksLowEarners, _weeksMidEarners, _weeksHighEarners, _allEarners);
-        weeklyMint();
-        distribute();
+    function redeem(address _addr) external {
+        require(msg.sender == _addr); // Is this necessary? Is it bad to let user 1 redeem for and give to user 2?
+        uint256 _amount = usersMap[_addr].currRedeemable;
+        usersMap[_addr].currRedeemable -= _amount;
+        _transfer(address(this), _addr, _amount);
     }
     function mintViaOwner(uint256 _num) external onlyOwner {
         _mint(address(this), _num);
