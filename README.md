@@ -30,3 +30,17 @@ RINKEBY_PRIVATE_KEY= https://metamask.io/
 ETHERSCAN_KEY= https://etherscan.io/    
 
 COINMARKET_KEY= https://pro.coinmarketcap.com/
+
+#Notes on V0 => V1
+
+Contract functionality in this version has changed from **Contract distributing tokens** to the **users distributing** their own tokens. The contract will still mint the amount needed to cover allocations, but that too could be offloaded to the user if required.
+
+User[] deleted
+getUser changed to a mapping
+distribute() deletes
+getWeeklyearnersCount deleted
+struct WeeklyInfo 1) address[] payableAddr deleted 2) uint weeksEarners count deleted
+deleted getUser()
+added GetTotalEarned()
+renamed getWeeklyInfoArrLength => getWeekCount
+in weeklyEarnings() 1) removed _allEarners[] param becuase we no longer need to iterate over those who earned 2) increment totalRedeemable in UsersMap

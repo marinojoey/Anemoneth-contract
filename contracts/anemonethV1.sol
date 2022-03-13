@@ -12,7 +12,6 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
 
     struct User {
         address addr;
-        string username;
         uint joinDate;
         bool isUser;
         uint256 currRedeemable;
@@ -41,11 +40,11 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         _mint(address(this), initSupply);
     }
 
-    function register(string memory _username) external payable {
+    function register() external payable {
         require(msg.value == 1 gwei);
         require(usersMap[msg.sender].isUser == false, "Account already registered!");
         _transfer(address(this), msg.sender, 1);
-        User memory newUser = User({ addr: msg.sender, username: _username, joinDate: block.timestamp, isUser: true, currRedeemable: 1 });
+        User memory newUser = User({ addr: msg.sender, joinDate: block.timestamp, isUser: true, currRedeemable: 1 });
         usersMap[msg.sender] = newUser;
     }
     function getTotalEarned(address _addr) external view returns(uint) {
@@ -58,9 +57,6 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
     function getCurrRedeemable(address _addr) external view returns(uint) {
         return usersMap[_addr].currRedeemable;
-    }
-    function getUserName(address _addr) external view returns(string memory) {
-        return usersMap[_addr].username;
     }
     function gethistoricalEarnings(uint _week, address _addr) external view returns(uint) {
         return historicalEarnings[_week][_addr];
