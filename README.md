@@ -1,5 +1,5 @@
 # AnemonEth
-We are a **Decentralized** social media platform
+We are a **Decentralized** social media platform that allows users to retain the value they create
 
 ## Rinkerscan Links
 Proxy: https://rinkeby.etherscan.io/address/0x70649c7b44ab1177EF8c058379ba975d78735378
