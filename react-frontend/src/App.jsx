@@ -2,24 +2,36 @@ import './App.scss';
 import React, { useState, createContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import Login from './components/LoginPage/Login';
-// import Homepage from './components/Homepage/Homepage';
-import BackendConnector from './components/BackendConnector/BackendConnector';
+import Homepage from './components/Homepage/Homepage';
+import Login from './components/Login/Login'
+import Navbar from './components/Navbar/Navbar';
 
 export const AuthContext = createContext();
 
 function App() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [userAddress, setUserAddress] = useState("");
+  const [isUser, setUser] = useState(false);
+  const [connected, setConn] = useState(false);
+  const [addr1, setAddr1] = useState(0);
+  const [dispAddr, setDispAddr] = useState("")
+  const [clwnblnc, setclwnblnc] = useState(0)
+  const [username, setUsername] = useState("")
+
+  // console.log(username)
 
   return (
-    <AuthContext.Provider value={{ authenticated, setAuthenticated, userAddress, setUserAddress }}>
+    <>
+    <Navbar clwnblnc={clwnblnc} dispAddr={dispAddr} username={username} connected={connected} />
+    <AuthContext.Provider value={isUser}>
       <Router>
         <Routes>
-          {/* <Route path="/" element={(authenticated && userAddress) ? <Homepage /> : <Login />} /> */}
-          <Route path="/" element={<BackendConnector />} />
+          <Route path="/" 
+            element = { (isUser) ? 
+              <Homepage isUser={isUser} connected={connected} addr1={addr1} /> : 
+              <Login setUser={setUser} setConn={setConn} setAddr1={setAddr1} setclwnblnc={setclwnblnc} setDispAddr={setDispAddr} setUsername={setUsername} addr1={addr1} connected={connected} />} />
         </Routes>
       </Router>
     </AuthContext.Provider>
+    </>
   );
 }
 

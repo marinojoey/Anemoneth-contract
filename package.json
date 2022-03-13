@@ -21,6 +21,7 @@
     "@openzeppelin/contracts": "^4.5.0",
     "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "@openzeppelin/hardhat-upgrades": "^1.15.0",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "hardhat-gas-reporter": "^1.0.8"
   }
 }
