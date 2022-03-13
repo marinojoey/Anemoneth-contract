@@ -1,0 +1,35 @@
+/* TODO Add site wide styles */
+
+* {
+    /* ETH COLORS */
+    --ethblue: rgb(28, 130, 255);
+    --ethlightblue: rgb(83, 211, 224);
+    --ethpeach: rgb(255, 156, 146);
+    --ethgold: rgb(243, 207, 88);
+    --ethred: rgb(255, 63, 63);
+    --ethnavy: rgb(61, 81, 160);
+    --ethfoamgreen: rgb(139, 254, 172);
+    --ethpurple: rgb(203, 175, 250);
+    --ethblack: rgb(34,34,34);
+    --ethgray: rgb(51, 51, 51);
+
+    /* ETH GRADIENT (backgrounds) */
+    --ethmagenta: rgb(128, 69, 115);
+    --ethyellow: rgb(169,162,138);
+    --ethorange: rgb(253, 169, 137);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen','Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.App {
+    text-align: center;
+}

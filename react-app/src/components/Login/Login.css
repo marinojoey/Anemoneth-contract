@@ -1,0 +1,43 @@
+/* @import "../../global.scss"; */
+
+.loginpage {
+    background-color: var(--ethgray);
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
+}
+
+.loginPiecesContainer {
+    padding: 10%;
+    width: 100%;
+    display: flex;
+}
+
+#title {
+    text-align: left;
+    margin-right: 5%;
+}
+
+.loginButtons {
+    /* width: 660px; */
+    width: 90%;
+    background-color: var(--ethpurple);
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.loginPieces {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+#cnctbtn {
+    margin: auto;
+}
+
+#regbtn {
+    width: 30%;
+    margin-left: 3px;
+}

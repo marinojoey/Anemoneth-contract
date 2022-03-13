@@ -1,0 +1,6 @@
+/* @import "../../global.scss"; */
+
+.root {
+    background-color: var(--ethgray);
+    height: 100vh;
+}
