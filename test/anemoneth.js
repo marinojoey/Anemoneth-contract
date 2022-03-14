@@ -5,7 +5,7 @@ const { solidity } = require("ethereum-waffle");
 
 chai.use(solidity);
 
-describe("Anemoneth contract instance 4, settleUp", function () { 
+describe("Anemoneth ", function () { 
   let AnemonethV1;
   let owner;
   let user1;
@@ -25,22 +25,22 @@ describe("Anemoneth contract instance 4, settleUp", function () {
 
     await AnemonethContract.deployed();
 
-    const tx = await AnemonethContract.connect(user1).register('test', {value: 1000000000}); // 1 Gwei
+    const tx = await AnemonethContract.connect(user1).register({value: 1000000000}); // 1 Gwei
     await tx.wait();
-    const tx2 = await AnemonethContract.connect(user2).register('CANIGETTHIS', {value: 1000000000}); // 1 Gwei
+    const tx2 = await AnemonethContract.connect(user2).register({value: 1000000000}); // 1 Gwei
     await tx2.wait(); 
-    const tx3 = await AnemonethContract.connect(user3).register('test', {value: 1000000000}); // 1 Gwei
+    const tx3 = await AnemonethContract.connect(user3).register({value: 1000000000}); // 1 Gwei
     await tx3.wait(); 
-    const tx4 = await AnemonethContract.connect(user4).register('test', {value: 1000000000}); // 1 Gwei
+    const tx4 = await AnemonethContract.connect(user4).register({value: 1000000000}); // 1 Gwei
     await tx4.wait(); 
-    const tx5 = await AnemonethContract.connect(user5).register('test', {value: 1000000000}); // 1 Gwei
+    const tx5 = await AnemonethContract.connect(user5).register({value: 1000000000}); // 1 Gwei
     await tx5.wait();
     await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [user5.address]);
 
   });
   describe("First week", function() {
     it("Should not allow user to register twice", async function () {        
-      await expect(AnemonethContract.connect(user1).register('test', {value: 1000000000})).to.be.revertedWith("Account already registered!");
+      await expect(AnemonethContract.connect(user1).register({value: 1000000000})).to.be.revertedWith("Account already registered!");
     });
     it("weeklyInfoArr should have one week added", async function () {
       const weekNumber = await AnemonethContract.connect(owner).getWeekCount();
@@ -71,19 +71,11 @@ describe("Anemoneth contract instance 4, settleUp", function () {
       const contractClwnBalance = await AnemonethContract.balanceOf(AnemonethContract.address);
       expect(contractClwnBalance).to.equal(11005);
     });
-    it("should be able to return userNames", async function () {
-      const userName = await AnemonethContract.connect(user2).getUserName(user2.address)
-      expect(userName).to.equal("CANIGETTHIS");
-    });
-    it("should be able to return userNames", async function () {
-      const userName = await AnemonethContract.connect(user1).getUserName(user1.address)
-      expect(userName).to.equal("test");
-    });
   });
 
   describe("Second week", function() {
     before(async function() {
-      const tx6 = await AnemonethContract.connect(user6).register('test', {value: 1000000000}); // 1 Gwei
+      const tx6 = await AnemonethContract.connect(user6).register({value: 1000000000}); // 1 Gwei
       await tx6.wait();
       await AnemonethContract.connect(owner).settleUp([user1.address, user2.address], [user3.address, user4.address], [user5.address, user6.address]);
     })
