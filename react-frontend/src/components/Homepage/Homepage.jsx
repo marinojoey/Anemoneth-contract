@@ -1,52 +1,56 @@
 import React, { useState, useRef } from 'react'
 import './homepage.scss';
-import { Web3Storage, File } from 'web3.storage'
+import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'  //'application/x-www-form-urlencoded';
 
 function Homepage( { isUser, connected, addr1, addrblnc } ) {
-
-  let status;
-  (() => {
-      if (connected) {
-      status = "connected"
-    } else status = "not connected"
-  })();
-
-let web3s = new Web3Storage({
-  token: process.env.REACT_APP_WEB3STORAGE_TOKEN
-});
-
-async function storeFiles() {
-  const string = document.querySelector('.str').value;
-  const file = new File([string], addr1);
-  const cid = await web3s.put([file]);
-  console.log('stored files with cid:', cid)
-  return cid
-}
-
-async function retrieveFiles(cid) {
-  const res = await web3s.get(cid)
-  console.log(`Got a response! [${res.status}] ${res.statusText}`)
-  if (!res.ok) {    
-    throw new Error(`failed to get ${cid}`)  
+  const handleFileSubmit = async (e) => {
+    e.preventDefault();
+    const file = e.target.elements[0].files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    await axios.post("/fileUpload", formData)
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.log(err);
+    })
   }
-  const files = await res.files()
-  const file = files[0]
-  let fileText = await file.text();
-  console.log(fileText)
-}
 
+  const handleStringSubmit = (e) => {
+    e.preventDefault();
+    const string = e.target.elements[0].value;
+    axios.post("/stringUpload", { string })
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  }
 
   return (
-      <div className='root'>    
-        <h1>HOMEPAGE</h1>
-        <label htmlFor='str' className='strlbl'></label>
-        <input type="text" className='str' placeholder='web3.storage'></input>
-        <button className='stringbtn' onClick={ storeFiles }>Post</button>
-        <br/>
-        <input type="text" className='cid' placeholder='Content Identifier'></input>
-        <button className='retrieve' onClick={ () => retrieveFiles(document.querySelector('.cid').value) }>Retrieve</button>
-      </div>
+    <div className='formsContainer'>
+      <h1>HOMEPAGE</h1>
+      <form onSubmit={handleFileSubmit}>
+        <label>
+          File Upload:
+          <input type="file" />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+      <br />
+      <form onSubmit={handleStringSubmit}>
+        <label>
+          String Upload:
+          <input type="text" />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
   )
 }
 

@@ -2,13 +2,13 @@
 
 .loginpage {
     background-color: $ethgray;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     align-items: center;
 
     .loginPiecesContainer {
         padding: 10%;
-        width: 100%;
+        width: 75%;
         display: flex;
 
         #title {
