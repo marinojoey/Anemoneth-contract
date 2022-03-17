@@ -8,7 +8,7 @@ import "hardhat/console.sol";
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
 
-    event Distribution(address indexed _addr, uint _amount);
+    event Allocation(address indexed _addr, uint _amount);
 
     struct User {
         address addr;
@@ -43,14 +43,12 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     function register() external payable {
         require(msg.value == 1 gwei);
         require(usersMap[msg.sender].isUser == false, "Account already registered!");
-        _transfer(address(this), msg.sender, 1);
         User memory newUser = User({ addr: msg.sender, joinDate: block.timestamp, isUser: true, currRedeemable: 1 });
         usersMap[msg.sender] = newUser;
     }
     function getTotalEarned(address _addr) external view returns(uint) {
-        uint256 weekCount = weeklyInfoArr.length;
         uint256 sum;
-        for (uint i=0; i<weekCount; i++) {
+        for (uint i=0; i<weeklyInfoArr.length; i++) {
            sum += historicalEarnings[i][_addr];
         }
         return sum;
@@ -85,8 +83,8 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
             usersMap[_weeksHighEarners[i]].currRedeemable += 3;
             _sum += 3;
         }
-        WeeklyInfo memory thisWeek = WeeklyInfo(weeklyInfoArr.length, _sum);
-        // require( (thisWeek.weekNumber >= ( (weeklyInfoArr[weeklyInfoArr.length-1].weekNumber) + 1 weeks )) || weeklyInfoArr.length == 0);
+        WeeklyInfo memory thisWeek = WeeklyInfo(block.timestamp, _sum);
+        require( (thisWeek.weekNumber >= ( (weeklyInfoArr[weeklyInfoArr.length-1].weekNumber) + 1 weeks )) || weeklyInfoArr.length == 0);
         weeklyInfoArr.push(thisWeek);
     }
 
@@ -102,8 +100,8 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
 
     function redeem(address _addr) external {
-        require(msg.sender == _addr); // Is this necessary? Is it bad to let user 1 redeem for and give to user 2?
-        uint256 _amount = usersMap[_addr].currRedeemable;
+        require(msg.sender == _addr);
+        uint256 _amount = usersMap[_addr].currRedeemable; //Delete with new algorithm??
         usersMap[_addr].currRedeemable -= _amount;
         _transfer(address(this), _addr, _amount);
     }
