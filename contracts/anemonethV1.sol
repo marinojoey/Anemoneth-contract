@@ -8,103 +8,106 @@ import "hardhat/console.sol";
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
 
-    event Allocation(address indexed _addr, uint _amount);
+    bool special;
 
     struct User {
         address addr;
         uint joinDate;
         bool isUser;
-        uint256 currRedeemable;
+        uint256 lastWeekNumberRedeemed;
     }
-    // user weekNumber => address => weeklyEarning
-    mapping(uint => mapping(address => uint)) historicalEarnings; // Must be immutable, So we need a seperate tally for curr redeemable
     mapping(address => User) usersMap;
 
-    struct WeeklyInfo {
-        uint weekNumber;
-        uint weeksNem;
-    }
-    // I would really like to not use this. Expensive. Does historicalEarnings mapping accomplish
-    WeeklyInfo[] weeklyInfoArr;
+    // user weekNumber => address => weeklyEarning
+    mapping(uint => mapping(address => uint)) historicalEarnings; 
+
+    // 1 indexed because of initializer
+    uint256[] weeklyTimestampsArr;
 
     function initialize(
         string memory name_, 
         string memory symbol_,
         uint256 cap_,
-        uint256 initSupply
-        // uint256 _entryFee
+        uint256 initSupply,
+        bool _special
         ) public initializer {
         __ERC20Capped_init(cap_);
         __ERC20_init(name_, symbol_);
         __Ownable_init();
         _mint(address(this), initSupply);
+        special = _special;
+        weeklyTimestampsArr.push(0);
     }
 
     function register() external payable {
         require(msg.value == 1 gwei);
         require(usersMap[msg.sender].isUser == false, "Account already registered!");
-        User memory newUser = User({ addr: msg.sender, joinDate: block.timestamp, isUser: true, currRedeemable: 1 });
+        historicalEarnings[weeklyTimestampsArr.length][msg.sender] = 1;
+        User memory newUser = User({ addr: msg.sender, joinDate: block.timestamp, isUser: true, lastWeekNumberRedeemed: weeklyTimestampsArr.length-1 });
         usersMap[msg.sender] = newUser;
     }
     function getTotalEarned(address _addr) external view returns(uint) {
         uint256 sum;
-        for (uint i=0; i<weeklyInfoArr.length; i++) {
+        for (uint i=0; i<weeklyTimestampsArr.length; i++) {
            sum += historicalEarnings[i][_addr];
         }
         return sum;
-    }
-    function getCurrRedeemable(address _addr) external view returns(uint) {
-        return usersMap[_addr].currRedeemable;
     }
     function gethistoricalEarnings(uint _week, address _addr) external view returns(uint) {
         return historicalEarnings[_week][_addr];
     }
     function getWeekCount() external view returns(uint) {
-        return weeklyInfoArr.length;
+        return weeklyTimestampsArr.length;
     }
     function isRegistered(address addr) external view returns(bool) {
         return usersMap[addr].isUser;
     }
     // _weeksArr will be formulated based on only those THAT EARNED that week
-    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) internal {
-        uint256 _sum = 0;
+    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external onlyOwner {
+        // require( block.timestamp >= weeklyTimestampsArr[weeklyTimestampsArr.length] + 1 weeks );
+        weeklyTimestampsArr.push(block.timestamp);
         for (uint256 i=0; i<_weeksLowEarners.length; i++) {
-            historicalEarnings[weeklyInfoArr.length][_weeksLowEarners[i]] = 1;
-            usersMap[_weeksLowEarners[i]].currRedeemable += 1;
-            _sum += 1;
+            historicalEarnings[weeklyTimestampsArr.length][_weeksLowEarners[i]] = 1;
         }
         for (uint256 i=0; i<_weeksMidEarners.length; i++) {
-            historicalEarnings[weeklyInfoArr.length][_weeksMidEarners[i]] = 2;
-            usersMap[_weeksMidEarners[i]].currRedeemable += 2;
-            _sum += 2;
+            historicalEarnings[weeklyTimestampsArr.length][_weeksMidEarners[i]] = 5;
         }
         for (uint256 i=0; i<_weeksHighEarners.length; i++) {
-            historicalEarnings[weeklyInfoArr.length][_weeksHighEarners[i]] = 3;
-            usersMap[_weeksHighEarners[i]].currRedeemable += 3;
-            _sum += 3;
+            historicalEarnings[weeklyTimestampsArr.length][_weeksHighEarners[i]] = 10;
         }
-        WeeklyInfo memory thisWeek = WeeklyInfo(block.timestamp, _sum);
-        require( (thisWeek.weekNumber >= ( (weeklyInfoArr[weeklyInfoArr.length-1].weekNumber) + 1 weeks )) || weeklyInfoArr.length == 0);
-        weeklyInfoArr.push(thisWeek);
     }
 
-    function weeklyMint() internal {
-        // mint enough NEM to cover weeklyEarnings() and possibly estimated tx fees
-        // check that weeklyEarnings() completed already
-        _mint(address(this), weeklyInfoArr[weeklyInfoArr.length-1].weeksNem);
+    function toggleSpecial() external onlyOwner {
+        special = !special;
     }
 
-    function settleUp(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external onlyOwner {
-        weeklyEarnings(_weeksLowEarners, _weeksMidEarners, _weeksHighEarners);
-        weeklyMint();
+    function getCurrRedeemable() public view returns(uint256) {
+        require(usersMap[msg.sender].isUser == true);
+        address _addr = msg.sender;
+        uint256 _sum;
+        uint256 _iterationCount = 0;
+        if(special) {_iterationCount = 5;}
+        for (uint i=weeklyTimestampsArr.length; i>usersMap[_addr].lastWeekNumberRedeemed; i--) {
+            _sum += ( historicalEarnings[i][_addr] + _iterationCount );
+            _iterationCount++;
+        }
+        return _sum;
     }
 
     function redeem(address _addr) external {
+        require(usersMap[msg.sender].isUser == true);
         require(msg.sender == _addr);
-        uint256 _amount = usersMap[_addr].currRedeemable; //Delete with new algorithm??
-        usersMap[_addr].currRedeemable -= _amount;
-        _transfer(address(this), _addr, _amount);
+        uint256 _sum;
+        uint256 _iterationCount = 0;
+        if(special) {_iterationCount = 5;}
+        for (uint i=weeklyTimestampsArr.length; i>usersMap[_addr].lastWeekNumberRedeemed; i--) {
+            _sum += ( historicalEarnings[i][_addr] + _iterationCount );
+            _iterationCount++;
+        }
+        _mint( _addr, _sum);
+        usersMap[_addr].lastWeekNumberRedeemed = weeklyTimestampsArr.length;
     }
+
     function mintViaOwner(uint256 _num) external onlyOwner {
         _mint(address(this), _num);
     }
