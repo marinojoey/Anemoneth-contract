@@ -137,12 +137,12 @@ describe.only("Anemoneth simple earnings", function () {
   });
   describe("All users redeem at end of third week", function() {
     before(async function() {
-      await AnemonethContract.connect(user1).redeem(user1.address);
-      await AnemonethContract.connect(user2).redeem(user2.address);
-      await AnemonethContract.connect(user3).redeem(user3.address);
-      await AnemonethContract.connect(user4).redeem(user4.address);
-      await AnemonethContract.connect(user5).redeem(user5.address);
-      await AnemonethContract.connect(user6).redeem(user6.address);
+      await AnemonethContract.connect(user1).redeem();
+      await AnemonethContract.connect(user2).redeem();
+      await AnemonethContract.connect(user3).redeem();
+      await AnemonethContract.connect(user4).redeem();
+      await AnemonethContract.connect(user5).redeem();
+      await AnemonethContract.connect(user6).redeem();
     })
     it("User 1 should have a correct currRedeemable", async function () {
       const user1CurrRedeemable = await AnemonethContract.connect(user1).getCurrRedeemable();

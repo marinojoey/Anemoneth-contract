@@ -8,7 +8,8 @@ import "hardhat/console.sol";
 
 contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
 
-    bool special;
+    bool oneSpecial;
+    bool fiveSpecial;
 
     struct User {
         address addr;
@@ -18,7 +19,7 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     }
     mapping(address => User) usersMap;
 
-    // user weekNumber => address => weeklyEarning
+    // user weekNumber => address => weeklyEarnings/currRedeemable
     mapping(uint => mapping(address => uint)) historicalEarnings; 
 
     // 1 indexed because of initializer
@@ -29,13 +30,15 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         string memory symbol_,
         uint256 cap_,
         uint256 initSupply,
-        bool _special
+        bool _oneSpecial,
+        bool _fiveSpecial
         ) public initializer {
         __ERC20Capped_init(cap_);
         __ERC20_init(name_, symbol_);
         __Ownable_init();
         _mint(address(this), initSupply);
-        special = _special;
+        oneSpecial = _oneSpecial;
+        fiveSpecial = _fiveSpecial;
         weeklyTimestampsArr.push(0);
     }
 
@@ -46,12 +49,47 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         User memory newUser = User({ addr: msg.sender, joinDate: block.timestamp, isUser: true, lastWeekNumberRedeemed: weeklyTimestampsArr.length-1 });
         usersMap[msg.sender] = newUser;
     }
-    function getTotalEarned(address _addr) external view returns(uint) {
-        uint256 sum;
-        for (uint i=0; i<weeklyTimestampsArr.length; i++) {
-           sum += historicalEarnings[i][_addr];
+    // _weeksArr will be formulated based on only those THAT EARNED that week
+    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external onlyOwner {
+        // require( block.timestamp >= weeklyTimestampsArr[weeklyTimestampsArr.length] + 1 weeks );
+        for (uint256 i=0; i<_weeksLowEarners.length; i++) {
+            historicalEarnings[weeklyTimestampsArr.length][_weeksLowEarners[i]] = 1;
         }
-        return sum;
+        for (uint256 i=0; i<_weeksMidEarners.length; i++) {
+            historicalEarnings[weeklyTimestampsArr.length][_weeksMidEarners[i]] = 5;
+        }
+        for (uint256 i=0; i<_weeksHighEarners.length; i++) {
+            historicalEarnings[weeklyTimestampsArr.length][_weeksHighEarners[i]] = 10;
+        }
+        weeklyTimestampsArr.push(block.timestamp);
+    }
+
+    function redeem() external payable {
+        require(usersMap[msg.sender].isUser == true);
+        uint256 _sum;
+        uint256 _iterationCount = 0;
+        if(oneSpecial) {_iterationCount += 1;}
+        if(fiveSpecial) {_iterationCount += 5;}
+        for (uint i=weeklyTimestampsArr.length-1; i>usersMap[msg.sender].lastWeekNumberRedeemed; i--) {
+            _sum += ( historicalEarnings[i][msg.sender] + _iterationCount );
+            _iterationCount++;
+        }
+        require(msg.value == 1 gwei);
+        _mint(msg.sender, _sum);
+        usersMap[msg.sender].lastWeekNumberRedeemed = weeklyTimestampsArr.length-1;
+    }
+
+    function getCurrRedeemable() public view returns(uint256) {
+        require(usersMap[msg.sender].isUser == true);
+        uint256 _sum;
+        uint256 _iterationCount = 0;
+        if(oneSpecial) {_iterationCount += 1;}
+        if(fiveSpecial) {_iterationCount += 5;}
+        for (uint i=weeklyTimestampsArr.length-1; i>usersMap[msg.sender].lastWeekNumberRedeemed; i--) {
+            _sum += ( historicalEarnings[i][msg.sender] + _iterationCount );
+            _iterationCount++;
+        }
+        return _sum;
     }
     function gethistoricalEarnings(uint _week, address _addr) external view returns(uint) {
         return historicalEarnings[_week][_addr];
@@ -62,56 +100,22 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
     function isRegistered(address addr) external view returns(bool) {
         return usersMap[addr].isUser;
     }
-    // _weeksArr will be formulated based on only those THAT EARNED that week
-    function weeklyEarnings(address[] memory _weeksLowEarners, address[] memory _weeksMidEarners, address[] memory _weeksHighEarners) external onlyOwner {
-        // require( block.timestamp >= weeklyTimestampsArr[weeklyTimestampsArr.length] + 1 weeks );
-        weeklyTimestampsArr.push(block.timestamp);
-        for (uint256 i=0; i<_weeksLowEarners.length; i++) {
-            historicalEarnings[weeklyTimestampsArr.length][_weeksLowEarners[i]] = 1;
-        }
-        for (uint256 i=0; i<_weeksMidEarners.length; i++) {
-            historicalEarnings[weeklyTimestampsArr.length][_weeksMidEarners[i]] = 5;
-        }
-        for (uint256 i=0; i<_weeksHighEarners.length; i++) {
-            historicalEarnings[weeklyTimestampsArr.length][_weeksHighEarners[i]] = 10;
-        }
-    }
-
-    function toggleSpecial() external onlyOwner {
-        special = !special;
-    }
-
-    function getCurrRedeemable() public view returns(uint256) {
-        require(usersMap[msg.sender].isUser == true);
-        address _addr = msg.sender;
-        uint256 _sum;
-        uint256 _iterationCount = 0;
-        if(special) {_iterationCount = 5;}
-        for (uint i=weeklyTimestampsArr.length; i>usersMap[_addr].lastWeekNumberRedeemed; i--) {
-            _sum += ( historicalEarnings[i][_addr] + _iterationCount );
-            _iterationCount++;
-        }
-        return _sum;
-    }
-
-    function redeem(address _addr) external {
-        require(usersMap[msg.sender].isUser == true);
-        require(msg.sender == _addr);
-        uint256 _sum;
-        uint256 _iterationCount = 0;
-        if(special) {_iterationCount = 5;}
-        for (uint i=weeklyTimestampsArr.length; i>usersMap[_addr].lastWeekNumberRedeemed; i--) {
-            _sum += ( historicalEarnings[i][_addr] + _iterationCount );
-            _iterationCount++;
-        }
-        _mint( _addr, _sum);
-        usersMap[_addr].lastWeekNumberRedeemed = weeklyTimestampsArr.length;
-    }
-
     function mintViaOwner(uint256 _num) external onlyOwner {
         _mint(address(this), _num);
     }
-    // catch for Ether
+    function togglefiveSpecial() external onlyOwner {
+        fiveSpecial = !fiveSpecial;
+    }
+    function toggleOneSpecial() external onlyOwner {
+        oneSpecial = !oneSpecial;
+    }
+    // Ether functionality
     receive() external payable {}
     fallback() external payable {}
+    function getBalance() public view onlyOwner returns(uint) {
+        return address(this).balance;
+    }
+    function withdraw(address payable _owner) public payable onlyOwner {
+        _owner.transfer(address(this).balance);
+    }
 }
