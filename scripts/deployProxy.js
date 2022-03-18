@@ -6,11 +6,10 @@ async function main() {
   const proxy = await upgrades.deployProxy(AnemonethV1, ["anemoneth", "FISH", 9000000000000, 10000, false, false]);
   await proxy.deployed();
 
-  console.log("Deployed at address: ", proxy.address);
-  console.log(`View at: https://rinkeby.etherscan.io/address/${proxy.address}`)
+  console.log(proxy.address);
   console.log("----------")
   console.log("Verification command below: USE IMPLEMENTATION ADDRESS")
-  console.log("npx hardhat verify --network rinkeby   ----")
+  console.log("npx hardhat verify --network rinkeby")
 }
 
 main();

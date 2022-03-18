@@ -1,10 +1,17 @@
 # AnemonEth
 We are a **Decentralized** social media platform that allows users to retain the value they create
 
-## Rinkerscan Links
-Proxy: https://rinkeby.etherscan.io/address/0x70649c7b44ab1177EF8c058379ba975d78735378
+## Ropsten testnet addresses
 
-Implementation: https://rinkeby.etherscan.io/address/0x7ca2ac30055340825587dbe6d88dc59345b4a6cc#code
+Proxy: 0xf69BEB25fAd2D18141895b056C3c2CcDbaa9E0f4
+
+implementation: 0xfEDc47Ba87FeB52829ad9198B533FE3B10C9c18A
+
+## Rop-scan Links
+
+Proxy: https://ropsten.etherscan.io/address/0xf69BEB25fAd2D18141895b056C3c2CcDbaa9E0f4
+
+Implementation: https://ropsten.etherscan.io/address/0xfedc47ba87feb52829ad9198b533fe3b10c9c18a#readContract
  
  ------------------
 ### DEPENDENCIES
