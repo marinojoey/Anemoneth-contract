@@ -71,8 +71,10 @@ contract AnemonethV1 is ERC20CappedUpgradeable, OwnableUpgradeable {
         if(oneSpecial) {_iterationCount = ( 1 * (uint256(10) ** uint8(18)));}
         else if(fiveSpecial) {_iterationCount = ( 5 * (uint256(10) ** uint8(18)));}
         for (uint i=weeklyTimestampsArr.length; i>usersMap[msg.sender].lastWeekNumberRedeemed; i--) {
-            _sum += ( historicalEarnings[i][msg.sender] + _iterationCount );
             _iterationCount += ( 1 * (uint256(10) ** uint8(18) ));
+            if( historicalEarnings[i][msg.sender] <= 0 ) {
+                _sum += ( historicalEarnings[i][msg.sender] + _iterationCount );
+            }
         }
         require(msg.value == 1 gwei);
         _mint(msg.sender, _sum);
