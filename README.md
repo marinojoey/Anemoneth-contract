@@ -1,5 +1,5 @@
 # [AnemonETH](https://anemoneth.herokuapp.com/)    
-A Web3 Social Media that __frictionlessly__ makes each user a shareholder         
+Contract repository for the web3 Social-Platform AnemonETH
 ## Currently [deployed]([Proxy](https://rinkeby.etherscan.io/address/0xD44DB4fA1D66319f93e45a42a61a7cE8058930b3)) on Testnet Rinkeby
 
 Contract address: 0xD44DB4fA1D66319f93e45a42a61a7cE8058930b3
